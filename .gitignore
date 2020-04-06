@@ -1,0 +1,8 @@
+# database
+/database/config.py
+/database/config.pyc
+/database/__pycache__/*
+/database/test.csv
+
+#etc
+.DS_Store
