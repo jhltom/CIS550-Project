@@ -58,7 +58,7 @@ const cap = 1000;		// Max allowed by API
 		params.offset += lim;
 	}
 
-	fs.writeFile("results.json", JSON.stringify({restaurants: results}), function(err) {
+	fs.writeFile("results.json", JSON.stringify({restaurants: results}) + "\n", function(err) {
 		console.log(err ? "ERROR: " + err : "DONE");
 	});
 })();
