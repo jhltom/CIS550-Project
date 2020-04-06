@@ -4,5 +4,8 @@
 /database/__pycache__/*
 /database/test.csv
 
+# env
+/env/Z1.project.env
+
 #etc
 .DS_Store
