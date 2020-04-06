@@ -78,7 +78,16 @@ dirs.forEach(function(dir) {
 	});
 });
 
+// Write business mapping to file (for business details query later)
+let b_map = Array.from(businesses.keys()).map(function(key) {
+	return key + "\t" + businesses.get(key);
+}).join("\n") + "\n";
 
+fs.writeFile("mapping.tsv", b_map, function(err) {
+	console.log(err ? "ERROR: " + err : "MAPPING DONE");
+});
+
+// Write tables to file
 fs.writeFile("restaurants.csv", r_table.join("\n") + "\n", function(err) {
 	console.log(err ? "ERROR: " + err : "R_TABLE DONE");
 });
