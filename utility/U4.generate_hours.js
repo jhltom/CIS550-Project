@@ -1,8 +1,8 @@
 // Parse arguments
 const args = process.argv.slice(2);
 
-if (args.length < 1) {
-	console.log("Directories file is missing.");
+if (args.length < 2) {
+	console.log("Required input files(2) are missing: <mapping file> <details file>");
 	return;
 }
 

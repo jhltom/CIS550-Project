@@ -1,6 +1,11 @@
 // Parse arguments
 const args = process.argv.slice(2);
 
+if (args.length < 1) {
+	console.log("Mapping file is missing.");
+	return;
+}
+
 // Import libraries
 const fs = require('fs');
 const env = require('dotenv');
