@@ -1,3 +1,5 @@
+// Add comment to test credentials
+
 // Parse arguments
 const args = process.argv.slice(2);
 
