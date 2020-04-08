@@ -28,6 +28,12 @@ let h_table = [];
 // Define day mapping
 let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
+// Define helper functions
+const conv_time = function(time) {
+	let conv = [time.slice(0, 2), time.slice(2), "00"].join(":");
+	return JSON.stringify(conv);
+}
+
 let noHours = 0;
 
 dirs.forEach(function(dir) {
@@ -54,14 +60,41 @@ dirs.forEach(function(dir) {
 			if (!hours.length) noHours++;
 
 			hours.forEach(function(hour) {
+				let always_open = 0;
+				let carryover;
+
+				// Open 24 hours
+				if (hour.is_overnight && hour.start === '0000' && hour.end === '0000') {
+					always_open = 1;
+				} else if (hour.is_overnight) { // Not 24 hours, but overnight
+					carryover = hour.end;
+					hour.end = '2359';
+				} else if (hour.end === '0000') { // Not overnight, but ends at midnight
+					hour.end = '2359';
+				}
+
 				h_table.push(
 					[
 						b_id,
 						days[hour.day],
-						parseInt(hour.start),
-						parseInt(hour.end)
+						conv_time(hour.start),
+						conv_time(hour.end),
+						always_open
 					].join(",")
 				);
+
+				// If carryover exists, create new row with incremented day and modified times
+				if (carryover) {
+					h_table.push(
+						[
+							b_id,
+							days[(hour.day + 1) % 7],
+							conv_time('0000'),
+							conv_time(carryover),
+							always_open
+						].join(",")
+					);
+				}
 			});
 
 			// This is to make sure that we've covered everything
