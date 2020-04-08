@@ -2,7 +2,7 @@ from config import *
 import csv
 import cx_Oracle  
 
-filename = "dishes.csv"
+filename = "./processedData/dishes.csv"
 
 try: 
     # Connect to Oracle database 
@@ -21,13 +21,17 @@ try:
         dishId = row['dishId']
         cuisine = row['cuisine']
     
-        query = "INSERT INTO Dishes (dishId, cuisine) VALUES ({dishId}, {cuisine})".format(dishId=dishId, cuisine=cuisine)
+        query = "INSERT INTO Dishes (dishId, cuisine) VALUES ({dishId}, '{cuisine}')".format(dishId=dishId, cuisine=cuisine)
 
         # Execute sql query
         cursor.execute(query) 
 
         # Commit
         db.commit()
+
+        # Print 
+        count += 1
+        print(dishId, cuisine, ": successfully added", count)
       
 except cx_Oracle.DatabaseError as e: 
     print("There is a problem with Oracle: ", e) 
