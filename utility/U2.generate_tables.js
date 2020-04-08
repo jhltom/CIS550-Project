@@ -16,6 +16,7 @@ const proc_restaurant = function(id, r) {
 		JSON.stringify(r.name),
 		JSON.stringify(r.location.display_address.join(", ")),
 		r.location.city,
+		r.location.state,
 		r.location.zip_code,
 		r.coordinates.latitude,
 		r.coordinates.longitude,
