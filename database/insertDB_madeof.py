@@ -18,27 +18,22 @@ try:
         csvreader = csv.DictReader(csvfile)
         count = 0
 
-        query = "INSERT ALL "
-
         for row in csvreader:
             dishId = row['dishId']
             ingredientId = row['ingredientId']
 
-            query += "INTO MadeOf (dishId, ingredientId) VALUES ({dishId}, {ingredientId}) ".format(
-                dishId=dishId, ingredientId=ingredientId)
+            query = "INSERT INTO MadeOf (dishId, ingredientId) VALUES ({dishId}, {ingredientId}) ".format(dishId=dishId, ingredientId=ingredientId)
 
-            # Print
+            # Execute sql query
+            cursor.execute(query) 
+
+            # Commit
+            db.commit()
+
+            # Print 
             count += 1
-            print(dishId, ingredientId, ": query constructed", count)
+            print(dishId, ingredientId, ": successfully added", count)
 
-    query += "SELECT 1 FROM DUAL"
-
-    # Execute sql query
-    cursor.execute(query)
-
-    # Commit
-    db.commit()
-    print("All ", count ," rows added successfully")
 
 except cx_Oracle.DatabaseError as e:
     print("There is a problem with Oracle: ", e)
