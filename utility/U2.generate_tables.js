@@ -10,9 +10,8 @@ if (args.length < 1) {
 const fs = require('fs');
 
 // Define helper functions
-const proc_restaurant = function(id, r) {
-	return [
-		id,
+const proc_restaurant = function(r) {
+	let info = [
 		JSON.stringify(r.name),
 		JSON.stringify(r.location.display_address.join(", ")),
 		r.location.city,
@@ -22,7 +21,19 @@ const proc_restaurant = function(id, r) {
 		r.coordinates.longitude,
 		r.rating,
 		r.review_count
-	].join(",");
+	];
+
+	// Strict checks to avoid falsy (but good) values messing with validity
+	let missing = info.filter(function(item) {
+		let checkA = item === undefined;
+		let checkB = item === null;
+		let checkC = item === '';
+
+		return checkA || checkB || checkC;
+	}).length;
+
+	if (missing === 0) return info.join(",");
+	return "";
 }
 
 // Process all provided json files
@@ -37,9 +48,9 @@ let b_id = 0;
 let c_id = 0;
 
 // Store table data
-let r_table = [];
-let c_table = [];
-let s_table = [];
+let r_table = ["businessId,name,address,city,state,postalCode,latitude,longitude,stars,reviewCount"];
+let c_table = ["cuisineId,cuisine"];
+let s_table = ["businessId,cuisineId"];
 
 dirs.forEach(function(dir) {
 	let json;
@@ -56,9 +67,13 @@ dirs.forEach(function(dir) {
 	restaurants.forEach(function(restaurant) {
 		// Business ids should not be repeated
 		if (!businesses.has(restaurant.id)) {
+			// Check for validity
+			let processed = proc_restaurant(restaurant);
+			if (processed.length === 0) return;
+			
 			// Create a table entry for this restaurant
 			businesses.set(restaurant.id, ++b_id);
-			r_table.push(proc_restaurant(b_id, restaurant));
+			r_table.push(b_id + "," + processed);
 
 			// Examine categories for restaurant
 			let cats = restaurant.categories;
