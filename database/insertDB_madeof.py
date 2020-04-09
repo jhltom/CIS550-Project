@@ -19,6 +19,7 @@ try:
         count = 0
 
         for row in csvreader:
+
             dishId = row['dishId']
             ingredientId = row['ingredientId']
 
