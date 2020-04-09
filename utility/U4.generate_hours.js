@@ -28,12 +28,6 @@ let h_table = ["businessId,day,startHour,endHour,allDay"];
 // Define day mapping
 let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-// Define helper functions
-const conv_time = function(time) {
-	let conv = [time.slice(0, 2), time.slice(2), "00"].join(":");
-	return JSON.stringify(conv);
-}
-
 let noHours = 0;
 
 dirs.forEach(function(dir) {
@@ -77,8 +71,8 @@ dirs.forEach(function(dir) {
 					[
 						b_id,
 						days[hour.day],
-						conv_time(hour.start),
-						conv_time(hour.end),
+						parseInt(hour.start),
+						parseInt(hour.end),
 						always_open
 					].join(",")
 				);
@@ -89,8 +83,8 @@ dirs.forEach(function(dir) {
 						[
 							b_id,
 							days[(hour.day + 1) % 7],
-							conv_time('0000'),
-							conv_time(carryover),
+							0,
+							parseInt(carryover),
 							always_open
 						].join(",")
 					);
