@@ -23,7 +23,7 @@ let details = fs.readFileSync(args[1], "utf8");
 let dirs = details.trim().split("\n");
 
 // Store table data
-let h_table = [];
+let h_table = ["businessId,day,startHour,endHour,allDay"];
 
 // Define day mapping
 let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
