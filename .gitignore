@@ -32,6 +32,12 @@
 /client/yarn-debug.log*
 /client/yarn-error.log*
 
+### server ###
+/server/node_modules
+/server/yarn-error.log*
+/server/yarn-debug.log*
+/server/npm-debug.log*
+
 ### etc ###
 .DS_Store
 database/processedData/*
