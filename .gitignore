@@ -32,4 +32,4 @@
 /client/yarn-error.log*
 
 ### etc ###
-.DS_Store
+.DS_Storedatabase/processedData/*
