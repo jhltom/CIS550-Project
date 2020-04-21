@@ -3,6 +3,7 @@
 /database/config.pyc
 /database/__pycache__/*
 /database/test.csv
+/database/.DS_Store
 
 
 ### env ###
@@ -32,4 +33,5 @@
 /client/yarn-error.log*
 
 ### etc ###
-.DS_Storedatabase/processedData/*
+.DS_Store
+database/processedData/*
