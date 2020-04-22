@@ -9,6 +9,14 @@ app.listen(PORT, () => {
   console.log(`Server listening on PORT ${PORT}`);
 });
 
+/* ---- (ingredients) ---- */
+app.get('/ingredients', routes.getAllIngredients);
+
+/* ---- (cuisine) ---- */
+app.get('/cuisines', routes.getAllCuisines);
+
+/* ---- (matched cuisine) ---- */
+app.get('/cuisines/:cuisine', routes.getMatchedCuisine);
 
 // Test endpoint
 app.get('/test', routes.test);
