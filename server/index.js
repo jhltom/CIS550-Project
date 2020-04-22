@@ -1,3 +1,4 @@
+// const process = require("process");
 const express = require("express");
 const routes = require("./routes.js");
 
@@ -17,5 +18,5 @@ app.get('/test', routes.test);
 
 
 // Cleanup methods on process termination
-process.on('SIGINT', routes.cleanup);
-process.on('SIGTERM', routes.cleanup);
+// process.on('SIGINT', routes.cleanup);
+// process.on('SIGTERM', routes.cleanup);
