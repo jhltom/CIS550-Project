@@ -1,5 +1,6 @@
+// const process = require("process");
 const express = require("express");
-const routes = requre("./routes.js");
+const routes = require("./routes.js");
 
 const app = express();
 const PORT = 8081;
@@ -16,3 +17,14 @@ app.get('/cuisines', routes.getAllCuisines);
 
 /* ---- (matched cuisine) ---- */
 app.get('/cuisines/:cuisine', routes.getMatchedCuisine);
+
+// Test endpoint
+app.get('/test', routes.test);
+
+// Define other endpoints here
+
+
+
+// Cleanup methods on process termination
+// process.on('SIGINT', routes.cleanup);
+// process.on('SIGTERM', routes.cleanup);

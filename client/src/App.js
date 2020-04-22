@@ -5,6 +5,7 @@ import {
 	Switch
 } from 'react-router-dom';
 import Home from './components/Home';
+import Feature2 from './components/Feature2';
 import './App.css';
 
 function App() {
@@ -24,6 +25,13 @@ function App() {
 						path="/Home"
 						render={() => (
 							<Home />
+						)}
+					/>
+					<Route
+						exact
+						path="/Feature2"
+						render={() => (
+							<Feature2 />
 						)}
 					/>
 				</Switch>

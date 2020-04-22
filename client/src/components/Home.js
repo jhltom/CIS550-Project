@@ -11,13 +11,18 @@ export default class Home extends React.Component {
       ingredients:[],
       cuisines:[]
     }
+
+    this.showCuisines = this.showCuisines.bind(this);
   }
+
+  // function called when the page load.
+
 
   render() {
     return (
 
       <div className="App">
-        <PageNavbar active="Status" />
+        <PageNavbar active="Home" />
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <p>

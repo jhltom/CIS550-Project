@@ -37,6 +37,7 @@
 /server/yarn-error.log*
 /server/yarn-debug.log*
 /server/npm-debug.log*
+/server/dbconfig.js
 
 ### etc ###
 .DS_Store
