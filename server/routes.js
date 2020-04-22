@@ -61,6 +61,11 @@ async function test(req, res) {
 	}
 }
 
+// Cleanup function
+async function cleanup() {
+	console.log("NOT IMPLEMENTED YET");
+}
+
 
 // Export functions to be used elsewhere serverside
 module.exports = {
