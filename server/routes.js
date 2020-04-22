@@ -44,6 +44,7 @@ function getMatchedCuisine(req, res){
             res.json(rows);
         }
      });
+<<<<<<< HEAD
 }
 
 // functinos to be called in index.js
@@ -51,4 +52,6 @@ module.exports={
     getAllIngredients: getAllIngredients,
     getAllCuisines: getAllCuisines,
     getMatchedCuisine: getMatchedCuisine
+=======
+>>>>>>> 62b6fc0f9b4105e0a41aba2c013330cb33b4ef2d
 }
