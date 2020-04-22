@@ -45,3 +45,10 @@ function getMatchedCuisine(req, res){
         }
      });
 }
+
+// functinos to be called in index.js
+module.exports={
+    getAllIngredients: getAllIngredients,
+    getAllCuisines: getAllCuisines,
+    getMatchedCuisine: getMatchedCuisine
+}
