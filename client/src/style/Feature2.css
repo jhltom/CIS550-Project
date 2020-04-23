@@ -10,3 +10,9 @@
 .restaurant .open {
   flex: 1 0 25%;
 }
+.restaurant .address {
+  font-size: 12px;
+}
+
+
+
