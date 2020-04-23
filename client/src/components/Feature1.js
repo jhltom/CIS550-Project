@@ -1,10 +1,10 @@
 import React from 'react';
-import '../style/Feature3.css';
+import '../style/Feature1.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Select from 'react-select';
 import PageNavbar from './PageNavbar';
 
-export default class Feature3 extends React.Component {
+export default class Feature1 extends React.Component {
 
   constructor(props) {
     super(props);
@@ -29,18 +29,18 @@ export default class Feature3 extends React.Component {
     // TODO: get of all ingredients from Ingredients db
 
     // For now for testing purposes: 
-    let selectedCIngredientDivs = [
+    let selectedIngredientDivs = [
       <div className="cuisine">
         <div className="cuisineName">American</div>
-        <div className="suitability">154</div>
+        <div className="suitability">90%</div>
       </div>,
       <div className="cuisine">
       <div className="cuisineName">Italian</div>
-      <div className="suitability">77</div>
+      <div className="suitability">77%</div>
     </div>,
         <div className="cuisine">
         <div className="cuisineName">Korean</div>
-        <div className="suitability">5</div>
+        <div className="suitability">5%</div>
     </div>
 
       ];
@@ -48,10 +48,10 @@ export default class Feature3 extends React.Component {
 
   }
 
-  handleChange = selectedIngredient => {
+  handleChange = selectedIngredients => {
     this.setState(
-      { selectedIngredient },
-      () => console.log(`Option selected:`, this.state.selectedIngredient)
+      { selectedIngredients },
+      () => console.log(`Option selected:`, this.state.selectedIngredients)
     );
 
     //TODO: create selectedIngredientDivs for selectedIngredient 
@@ -62,14 +62,14 @@ export default class Feature3 extends React.Component {
 
   render() {
     return (
-      <div className="Feature3">
-        <PageNavbar active="Feature3" />
+      <div className="Feature1">
+        <PageNavbar active="Feature1" />
         <div className="container">
 
           <Select
-            value={this.state.selectedIngredient}
+            value={this.state.selectedIngredients}
             onChange={this.handleChange}
-            options={this.state.ingredientOptions}
+            options={this.state.ingredientsOptions}
             isMulti
             isSearchable
             placeholder="Select ingredient(s) ... "
@@ -77,8 +77,8 @@ export default class Feature3 extends React.Component {
 
           <div className="header-container">
             <div className="headers">
-              <div className="cuisine"><strong>Cuisine Type</strong></div>
-              <div className="cuisine"><strong>suitability</strong></div>
+              <div className="header"><strong>Cuisine Type</strong></div>
+              <div className="header"><strong>Matching Scores</strong></div>
             </div>
           </div>
 
