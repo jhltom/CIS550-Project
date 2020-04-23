@@ -24,20 +24,22 @@ export default class Feature2 extends React.Component {
     }
   }
 
-  componentDidMount = () => {
+  componentDidMount = async() => {
 
     // TODO: get of all cuisine types from CuisineType db
-
-    // For now for testing purposes: 
-    let selectedCuisineDivs = [
-      <div className="restaurant">
-        <div className="restaurantName">Tom's Restaurant</div>
-        <div className="cuisineType">Korean, Mexican, Spanish</div>
-        <div className="address">310 S. 36th Street</div>
-        <div className="open">Open</div>
-      </div>];
-    this.setState({ selectedCuisineDivs });
-
+    await fetch("http://localhost:8081/test/",
+      {
+        method: 'GET'
+      }).then( res => {
+        return res.json();
+      }, err => {
+        console.log(err);
+      }).then( cuisineType => {
+        console.log(cuisineType);
+      }, err => {
+        console.log(err);
+      });
+  
   }
 
   handleChange = selectedCuisine => {

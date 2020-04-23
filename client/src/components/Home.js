@@ -8,11 +8,7 @@ export default class Home extends React.Component {
     super(props);
 
     this.state = {
-      ingredients:[],
-      cuisines:[]
     }
-
-    this.showCuisines = this.showCuisines.bind(this);
   }
 
   // function called when the page load.

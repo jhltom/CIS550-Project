@@ -7,12 +7,14 @@ let pool;
 
 // Async function to initialize connection pool
 async function initPool() {
+	console.log(oracle)
+	console.log(config)
 	try {
 		pool = await oracle.createPool(config);
 		console.log("Connection pool created.");
 		return pool;
 	} catch (e) {
-		console.log("Pool creation failed.");
+		console.log("Pool creation failed.",  e);
 	}
 }
 
@@ -110,6 +112,43 @@ function getMatchedCuisine(req, res){
      });
 }
 
+/* ---- (cuisine types) ---- */
+async function getAllCuisineTypes(req, res) {
+	// Define query here
+	const query = `SELECT cuisine FROM CuisineType`;
+
+	// Keep connection in wider scope
+	let connection;
+
+	try {
+		// Get connection pool
+		let pool = await getPool();
+
+		// Obtain single connection from pool
+		connection = await pool.getConnection();
+
+		// Query the db
+		let result = await connection.execute(query);
+
+		// Send response
+		console.log("Result: ", result);
+		res.json(result);
+
+	} catch (e) {
+		console.log(e);
+
+	} finally {
+		if (connection) {
+			try {
+				// Close connection and return it to the pool
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+}
+
 
 // Cleanup function
 async function cleanup() {
@@ -122,5 +161,6 @@ module.exports = {
 	test: test,
     getAllIngredients: getAllIngredients,
     getAllCuisines: getAllCuisines,
-    getMatchedCuisine: getMatchedCuisine
+		getMatchedCuisine: getMatchedCuisine,
+	getAllCuisineTypes: getAllCuisineTypes,
 }
