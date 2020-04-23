@@ -1,13 +1,12 @@
 // const process = require("process");
 const express = require("express");
 const routes = require("./routes.js");
+const cors = require('cors');
 
 const app = express();
 const PORT = 8081;
 
-app.listen(PORT, () => {
-  console.log(`Server listening on PORT ${PORT}`);
-});
+app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 
 /* ---- (ingredients) ---- */
 app.get('/ingredients', routes.getAllIngredients);
@@ -24,9 +23,10 @@ app.get('/cuisineTypes', routes.getAllCuisineTypes);
 // Test endpoint
 app.get('/test', routes.test);
 
-// Define other endpoints here
 
-
+app.listen(PORT, () => {
+  console.log(`Server listening on PORT ${PORT}`);
+});
 
 // Cleanup methods on process termination
 // process.on('SIGINT', routes.cleanup);
