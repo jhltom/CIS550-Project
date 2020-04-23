@@ -212,14 +212,23 @@ async function getAllCuisineTypes(req, res) {
 
 /* ---- (restaurants with given cuisine) ---- */
 async function getRestaurantsWithCuisine(req, res) {
-
 	const cuisineType = req.params.cuisineType;
+	const day = req.params.day;
 	const query = `
-		SELECT r.businessId, r.name, r.address
-		FROM Restaurants r 
-		JOIN Serve s ON r.businessId = s.businessId
-		JOIN CuisineType f ON f.cuisineId = s.cuisineId
-		WHERE f.cuisine = '${cuisineType}'
+		WITH Temp AS(
+			SELECT r.businessId, r.name, r.address, r.state
+			FROM Restaurants r 
+			JOIN Serve s ON r.businessId = s.businessId
+			JOIN CuisineType f ON f.cuisineId = s.cuisineId
+			WHERE f.cuisine = '${cuisineType}'
+		),
+		Hours AS(
+			SELECT *
+			FROM OpenHours
+			WHERE day = '${day}'
+		)
+		SELECT *
+		FROM Temp r JOIN Hours h ON r.businessId = h.businessId
 	`;
 	let connection;
 

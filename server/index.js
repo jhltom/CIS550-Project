@@ -21,7 +21,7 @@ app.get('/cuisines/:cuisine', routes.getMatchedCuisine);
 app.get('/cuisineTypes', routes.getAllCuisineTypes);
 
 /* ---- (restaurants with given cuisine) ---- */
-app.get('/cuisineRestaurants/:cuisineType', routes.getRestaurantsWithCuisine);
+app.get('/cuisineRestaurants/:cuisineType/:day', routes.getRestaurantsWithCuisine);
 
 // Test endpoint
 app.get('/test', routes.test);
