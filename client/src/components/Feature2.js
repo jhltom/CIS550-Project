@@ -10,6 +10,7 @@ export default class Feature2 extends React.Component {
     super(props);
 
     this.state = {
+      day: "",
       cuisineOptions: [
         { value: 'American', label: 'American' },
         { value: 'Chinese', label: 'Chinese' },
@@ -25,7 +26,24 @@ export default class Feature2 extends React.Component {
   }
 
   componentDidMount = async () => {
+    const date = new Date();
+    const day = date.getDay();
+    let dayStr = "";
+    switch (day) {
+      case 0: dayStr = "Sun"; break;
+      case 1: dayStr = "Mon"; break;
+      case 2: dayStr = "Tue"; break;
+      case 3: dayStr = "Wed"; break;
+      case 4: dayStr = "Thu"; break;
+      case 5: dayStr = "Fri"; break;
+      case 6: dayStr = "Sat"; break;
+    }
+    this.setState({ day: dayStr });
 
+    await this.getCuisineTypes();
+  }
+
+  getCuisineTypes = async () => {
     await fetch("http://localhost:8081/cuisineTypes/",
       {
         method: 'GET'
@@ -62,27 +80,33 @@ export default class Feature2 extends React.Component {
 
   getRestaurants = async selectedCuisine => {
     console.log('called', selectedCuisine)
-    await fetch("http://localhost:8081/cuisineRestaurants/" + selectedCuisine, {
+    console.log('day', this.state.day)
+    await fetch("http://localhost:8081/cuisineRestaurants/" + selectedCuisine + "/" + this.state.day, {
       method: "GET",
     }).then(async res => {
-      // console.log("resultado: ", res.json());
-      // if (res.status >= 400) {
-      //   throw new Error("Bad response from server. Status: " + res.status);
-      // }
       return res.json();
     }, err => {
       console.warn(err);
     }).then(async result => {
       console.log(result.rows)
+      const date = new Date();
+      const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+      let time;
       let selectedCuisineDivs = result.rows.map((restaurant, i) => {
-        return (
-          <div key={i} className="restaurant">
-            <div className="restaurantName">{restaurant[1]}</div>
-            <div className="cuisineType">{selectedCuisine}</div>
-            <div className="address">{restaurant[2]}</div>
-            <div className="open">Open</div>
-          </div>
-        )
+        if (restaurant[3] === 'CA') time = new Date(utc + (3600000 * -7));
+        else time = new Date(utc + (3600000 * -4));
+        const timeFormatted = Number(String(time.getHours()) + String(time.getMinutes()))
+
+        if (restaurant[6] < timeFormatted && timeFormatted < restaurant[7]) {
+          console.log("Start:", restaurant[6], " End:", restaurant[7], " CurrTime:", timeFormatted)
+          return (
+            <div key={i} className="restaurant">
+              <div className="restaurantName">{restaurant[1]}</div>
+              <div className="cuisineType">{selectedCuisine}</div>
+              <div className="address">{restaurant[2]}</div>
+            </div>
+          )
+        }
       });
       this.setState({ selectedCuisineDivs });
     }, err => {
@@ -115,7 +139,6 @@ export default class Feature2 extends React.Component {
               <div className="header"><strong>Retaurant</strong></div>
               <div className="header"><strong>Cuisine Type</strong></div>
               <div className="header"><strong>Address</strong></div>
-              <div className="header"><strong>Open/Closed</strong></div>
             </div>
           </div>
 
