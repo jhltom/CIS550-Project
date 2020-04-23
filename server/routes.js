@@ -65,51 +65,124 @@ async function test(req, res) {
 
 
 /* ---- (ingredients) ---- */
-function getAllIngredients(req, res){
-  var query = `
-    SELECT DISTINCT ingredient from ingredients;
-  `;
-  connection.query(query, function(err, rows, fields){
-      if(err) console.log(err);
-      else{
-          res.json(rows);
-      }
-  });
-};
+async function getAllIngredients(req, res) {
+	// Define query here
+	const query = `SELECT DISTINCT ingredient from ingredients;`;
+
+	// Keep connection in wider scope
+	let connection;
+
+	try {
+		// Get connection pool
+		let pool = await getPool();
+
+		// Obtain single connection from pool
+		connection = await pool.getConnection();
+
+		// Query the db
+		let result = await connection.execute(query);
+
+		// Send response
+		console.log("Result: ", result);
+		res.json(result);
+
+	} catch (e) {
+		console.log(e);
+
+	} finally {
+		if (connection) {
+			try {
+				// Close connection and return it to the pool
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+}
 
 /* ---- (cuisine) ---- */
-function getAllCuisines(req, res){
-  var query =`
-    SELECT distinct dishes.cuisine FROM dishes;
-  `;
-  connection.query(query, function(err, rows, fields){
-    if(err) console.log(err);
-    else{
-        res.json(rows);
-    }
-  });
-};
+async function getAllCuisines(req, res) {
+	// Define query here
+	const query = `SELECT distinct dishes.cuisine FROM dishes;`;
+
+	// Keep connection in wider scope
+	let connection;
+
+	try {
+		// Get connection pool
+		let pool = await getPool();
+
+		// Obtain single connection from pool
+		connection = await pool.getConnection();
+
+		// Query the db
+		let result = await connection.execute(query);
+
+		// Send response
+		console.log("Result: ", result);
+		res.json(result);
+
+	} catch (e) {
+		console.log(e);
+
+	} finally {
+		if (connection) {
+			try {
+				// Close connection and return it to the pool
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+}
 
 /* ---- (matched cuisine) ---- */
-function getMatchedCuisine(req, res){
-    var inputIngredients = req.params.ingredients;
-    var query = `
-        SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
-        FROM Dishes d
-        WHERE EXISTS(
-            SELECT * 
-            FROM MadeOf m2 JOIN Ingredients i ON m2.ingredientId = i.id
-            WHERE i.ingredient like '%${inputIngredients}%' AND  d.dishId = m2.dishId
-        )
-        GROUP BY d.cuisine
-        ORDER BY freq DESC;
-    `;
-    connection.query(query, function(err, rows, fields){
-        if(err) console.log(err);
-        else{
-            res.json(rows);
-        }
-     });
+async function getMatchedCuisine(req, res) {
+	// Define query here
+	const query = `
+		SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
+		FROM Dishes d
+		WHERE EXISTS(
+			SELECT * 
+			FROM MadeOf m2 JOIN Ingredients i ON m2.ingredientId = i.id
+			WHERE i.ingredient like '%${inputIngredients}%' AND  d.dishId = m2.dishId
+		)
+		GROUP BY d.cuisine
+		ORDER BY freq DESC;
+	`;
+
+	// Keep connection in wider scope
+	let connection;
+
+	try {
+		// Get connection pool
+		let pool = await getPool();
+
+		// Obtain single connection from pool
+		connection = await pool.getConnection();
+
+		// Query the db
+		let result = await connection.execute(query);
+
+		// Send response
+		console.log("Result: ", result);
+		res.json(result);
+
+	} catch (e) {
+		console.log(e);
+
+	} finally {
+		if (connection) {
+			try {
+				// Close connection and return it to the pool
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
 }
 
 /* ---- (cuisine types) ---- */
@@ -161,6 +234,6 @@ module.exports = {
 	test: test,
     getAllIngredients: getAllIngredients,
     getAllCuisines: getAllCuisines,
-		getMatchedCuisine: getMatchedCuisine,
+	getMatchedCuisine: getMatchedCuisine,
 	getAllCuisineTypes: getAllCuisineTypes,
 }
