@@ -7,8 +7,8 @@ export default class Home extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-    }
+
+
   }
 
   // function called when the page load.
