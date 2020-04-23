@@ -1,0 +1,12 @@
+.header-container .headers, .results-container .cuisine {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    height: 40px;
+  }
+  
+  .headers .header, 
+  .cuisine .cuisineName, .cuisine .suitability
+   {
+    flex: 1 0 25%;
+  }

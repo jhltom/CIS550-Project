@@ -77,8 +77,8 @@ export default class Feature3 extends React.Component {
 
           <div className="header-container">
             <div className="headers">
-              <div className="header"><strong>Cuisine Type</strong></div>
-              <div className="header"><strong>suitability</strong></div>
+              <div className="cuisine"><strong>Cuisine Type</strong></div>
+              <div className="cuisine"><strong>suitability</strong></div>
             </div>
           </div>
 
