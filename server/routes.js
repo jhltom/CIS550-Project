@@ -187,33 +187,21 @@ async function getMatchedCuisine(req, res) {
 
 /* ---- (cuisine types) ---- */
 async function getAllCuisineTypes(req, res) {
-	// Define query here
-	const query = `SELECT cuisine FROM CuisineType`;
 
-	// Keep connection in wider scope
+	const query = `SELECT cuisine FROM CuisineType`;
 	let connection;
 
 	try {
-		// Get connection pool
 		let pool = await getPool();
-
-		// Obtain single connection from pool
 		connection = await pool.getConnection();
-
-		// Query the db
 		let result = await connection.execute(query);
-
-		// Send response
-		console.log("Result: ", result);
+		// console.log("Result: ", result);
 		res.json(result);
-
 	} catch (e) {
 		console.log(e);
-
 	} finally {
 		if (connection) {
 			try {
-				// Close connection and return it to the pool
 				await connection.close();
 			} catch(e) {
 				console.log("Failed to close connection");
@@ -222,6 +210,37 @@ async function getAllCuisineTypes(req, res) {
 	}
 }
 
+/* ---- (restaurants with given cuisine) ---- */
+async function getRestaurantsWithCuisine(req, res) {
+
+	const cuisineType = req.params.cuisineType;
+	const query = `
+		SELECT r.businessId, r.name, r.address
+		FROM Restaurants r 
+		JOIN Serve s ON r.businessId = s.businessId
+		JOIN CuisineType f ON f.cuisineId = s.cuisineId
+		WHERE f.cuisine = '${cuisineType}'
+	`;
+	let connection;
+
+	try {
+		let pool = await getPool();
+		connection = await pool.getConnection();
+		let result = await connection.execute(query);
+		console.log("Result: ", result);
+		res.json(result);
+	} catch (e) {
+		console.log(e);
+	} finally {
+		if (connection) {
+			try {
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+}
 
 // Cleanup function
 async function cleanup() {
@@ -236,4 +255,5 @@ module.exports = {
     getAllCuisines: getAllCuisines,
 	getMatchedCuisine: getMatchedCuisine,
 	getAllCuisineTypes: getAllCuisineTypes,
+	getRestaurantsWithCuisine: getRestaurantsWithCuisine,
 }

@@ -20,6 +20,9 @@ app.get('/cuisines/:cuisine', routes.getMatchedCuisine);
 /* ---- (cuisine types) ---- */
 app.get('/cuisineTypes', routes.getAllCuisineTypes);
 
+/* ---- (restaurants with given cuisine) ---- */
+app.get('/cuisineRestaurants/:cuisineType', routes.getRestaurantsWithCuisine);
+
 // Test endpoint
 app.get('/test', routes.test);
 
