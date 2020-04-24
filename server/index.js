@@ -23,6 +23,9 @@ app.get('/cuisines/:ingredients', routes.getMatchedCuisine);
 /* ---- (cuisine types) ---- */
 app.get('/cuisineTypes', routes.getAllCuisineTypes);
 
+/* ---- (cuisine types) ---- */
+app.get('/cuisineTypesFull', routes.getAllCuisineTypesFull);
+
 /* ---- (restaurants with given cuisine) ---- */
 app.get('/cuisineRestaurants/:cuisineType/:day', routes.getRestaurantsWithCuisine);
 

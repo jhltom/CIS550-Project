@@ -29,22 +29,22 @@ export default class Feature1 extends React.Component {
     // TODO: get of all ingredients from Ingredients db
 
     // For now for testing purposes: 
-    let selectedIngredientDivs = [
-      <div className="cuisine">
-        <div className="cuisineName">American</div>
-        <div className="suitability">90%</div>
-      </div>,
-      <div className="cuisine">
-      <div className="cuisineName">Italian</div>
-      <div className="suitability">77%</div>
-    </div>,
-        <div className="cuisine">
-        <div className="cuisineName">Korean</div>
-        <div className="suitability">5%</div>
-    </div>
+    // let selectedIngredientDivs = [
+    //   <div className="cuisine">
+    //     <div className="cuisineName">American</div>
+    //     <div className="suitability">90%</div>
+    //   </div>,
+    //   <div className="cuisine">
+    //   <div className="cuisineName">Italian</div>
+    //   <div className="suitability">77%</div>
+    // </div>,
+    //     <div className="cuisine">
+    //     <div className="cuisineName">Korean</div>
+    //     <div className="suitability">5%</div>
+    // </div>
 
-      ];
-    this.setState({ selectedIngredientDivs });
+    //   ];
+    // this.setState({ selectedIngredientDivs });
     await this.getAllIngredients();
 
   }
