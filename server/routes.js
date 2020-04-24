@@ -251,6 +251,82 @@ async function getRestaurantsWithCuisine(req, res) {
 	}
 }
 
+/* ---- (top 5 related cuisine to a given cuisine) ---- */
+async function getRelatedCuisines(req, res) {
+	const cuisineId = req.params.cuisineId;
+
+	// Add some validation later
+
+	const query = `
+		WITH reference AS (
+			SELECT DISTINCT ingredientId
+			FROM CuisineType ct
+			JOIN Dishes d ON ct.cuisine = d.cuisine
+			JOIN MadeOf mo ON mo.dishId = d.dishId
+			WHERE ct.cuisineId = ${cuisineId}
+		), refMembership AS (
+			SELECT DISTINCT ct.cuisine AS cuisine, ingredientId
+			FROM CuisineType ct
+			JOIN Dishes d ON ct.cuisine = d.cuisine
+			JOIN MadeOf mo ON mo.dishId = d.dishId
+			WHERE ingredientId IN (
+				SELECT * FROM reference
+			)
+			AND ct.cuisineId != ${cuisineId}
+		), memberCounts AS (
+			SELECT cuisine, COUNT(*) AS count
+			FROM refMembership
+			GROUP BY cuisine
+			ORDER BY count DESC
+		) SELECT *
+		FROM memberCounts
+		WHERE ROWNUM <= 5
+	`;
+
+	// Keep connection in wider scope
+	let connection;
+
+	try {
+		// Get connection pool
+		let pool = await getPool();
+
+		// Obtain single connection from pool
+		connection = await pool.getConnection();
+
+		// Query the db
+		let result = await connection.execute(query);
+
+		// Send response
+		console.log("Result: ", result);
+		res.json(result);
+
+	} catch (e) {
+		console.log(e);
+
+	} finally {
+		if (connection) {
+			try {
+				// Close connection and return it to the pool
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+}
+
+/* ---- (restaurants within user-specified distance of user GPS) ---- */
+async function getNearbyRestaurants(req, res) {
+	console.log("POST received");
+	console.log(req.body);
+}
+
+/* ---- (cuisines strictly not using selected ingredients) ---- */
+async function test(req, res) {
+	console.log("POST received");
+	console.log(req.body);
+}
+
 // Cleanup function
 async function cleanup() {
 	console.log("NOT IMPLEMENTED YET");
@@ -265,4 +341,5 @@ module.exports = {
 	getMatchedCuisine: getMatchedCuisine,
 	getAllCuisineTypes: getAllCuisineTypes,
 	getRestaurantsWithCuisine: getRestaurantsWithCuisine,
+	getRelatedCuisines: getRelatedCuisines,
 }

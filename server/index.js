@@ -23,9 +23,11 @@ app.get('/cuisineTypes', routes.getAllCuisineTypes);
 /* ---- (restaurants with given cuisine) ---- */
 app.get('/cuisineRestaurants/:cuisineType/:day', routes.getRestaurantsWithCuisine);
 
+/* ---- (top 5 related cuisine to a given cuisine) ---- */
+app.get('/relatedCuisines/:cuisineId', routes.getRelatedCuisines);
+
 // Test endpoint
 app.get('/test', routes.test);
-
 
 app.listen(PORT, () => {
   console.log(`Server listening on PORT ${PORT}`);
