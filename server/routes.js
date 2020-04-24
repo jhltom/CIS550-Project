@@ -67,7 +67,7 @@ async function test(req, res) {
 /* ---- (ingredients) ---- */
 async function getAllIngredients(req, res) {
 	// Define query here
-	const query = `SELECT DISTINCT ingredient from ingredients;`;
+	const query = `SELECT DISTINCT ingredient from ingredients WHERE rownum <= 100`;
 
 	// Keep connection in wider scope
 	let connection;
@@ -104,7 +104,7 @@ async function getAllIngredients(req, res) {
 /* ---- (cuisine) ---- */
 async function getAllCuisines(req, res) {
 	// Define query here
-	const query = `SELECT distinct dishes.cuisine FROM dishes;`;
+	const query = `SELECT distinct dishes.cuisine FROM dishes`;
 
 	// Keep connection in wider scope
 	let connection;

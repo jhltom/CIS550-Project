@@ -24,7 +24,7 @@ export default class Feature1 extends React.Component {
     }
   }
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
 
     // TODO: get of all ingredients from Ingredients db
 
@@ -45,7 +45,35 @@ export default class Feature1 extends React.Component {
 
       ];
     this.setState({ selectedIngredientDivs });
+    await this.getAllIngredients();
 
+  }
+
+  getAllIngredients = async () => {
+    await fetch("http://localhost:8081/ingredients/",{
+      method: 'GET'
+    }).then(res => {
+      return res.json();
+    }, err => {
+      console.log(err);
+    }).then(result => {
+      let ingredientsOptions = result.rows.map((row, i) => {
+        const ingredient = row[0].trim();
+        return ({
+          value: ingredient,
+          label: ingredient
+        })
+      });
+      // ingredientsOptions.sort((x, y) => {
+      //   const X = x.value;
+      //   const Y = y.value;
+      //   return X < Y ? -1 : X > Y ? 1 : 0;
+      // });
+      this.setState({ingredientsOptions});
+      console.log(ingredientsOptions);
+    }, err => {
+      console.log(err);
+    });
   }
 
   handleChange = async selectedIngredients => {
