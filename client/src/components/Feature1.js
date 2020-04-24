@@ -19,7 +19,7 @@ export default class Feature1 extends React.Component {
         { value: 'advocado', label: 'advocado' },
         { value: 'potato', label: 'potato' },
       ],
-      selectedIngredients: [],
+      selectedIngredients: null,
       selectedIngredientDivs: [],
     }
   }
@@ -81,8 +81,8 @@ export default class Feature1 extends React.Component {
       { selectedIngredients },
       () => console.log(`Option selected:`, this.state.selectedIngredients)
     );
-    console.log(selectedIngredients[0].value)
-    await this.getCuisines(selectedIngredients[0].value);
+    console.log(selectedIngredients.value)
+    await this.getCuisines(selectedIngredients.value);
 
   };
 
@@ -122,7 +122,7 @@ export default class Feature1 extends React.Component {
             value={this.state.selectedIngredients}
             onChange={this.handleChange}
             options={this.state.ingredientsOptions}
-            isMulti
+            //isMulti
             isSearchable
             placeholder="Select ingredient(s) ... "
           />
