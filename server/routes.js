@@ -140,31 +140,50 @@ async function getAllCuisines(req, res) {
 
 /* ---- (matched cuisine) ---- */
 async function getMatchedCuisine(req, res) {
-	const selectedIngredients = JSON.parse(req.body.ingredients);
-	console.log(selectedIngredients[0].value);
-	let subquery = ``;
-	for(i = 0; i < selectedIngredients.length; i++){
-		if(i > 0){
-			subquery += 'AND';
-		}
-		subquery += `
-			WHERE EXISTS(
-				SELECT * 
-				FROM MadeOf m2 JOIN Ingredients i ON m2.ingredientId = i.id
-				WHERE i.ingredient like '%${inputIngredients}%' AND  d.dishId = m2.dishId
-			)
-		`;
-		
-	}
+
+	const selectedIngredients = req.params.ingredients;
+	console.log(selectedIngredients);
 
 	// Define query here
 	const query = `
 		SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
 		FROM Dishes d
-		'%${subquery}%'
+		WHERE EXISTS(
+			SELECT * 
+			FROM MadeOf m2 JOIN Ingredients i ON m2.ingredientId = i.id
+			WHERE i.ingredient like '${selectedIngredients}' AND  d.dishId = m2.dishId
+		)
 		GROUP BY d.cuisine
-		ORDER BY freq DESC;
+		ORDER BY freq DESC
 	`;
+	console.log(query);
+
+	// console.log(req.body);
+	// console.log(JSON.parse(req.body));
+	// const selectedIngredients = req.params.data;
+	// let subquery = ``;
+	// for(i = 0; i < selectedIngredients.length; i++){
+	// 	if(i > 0){
+	// 		subquery += 'AND';
+	// 	}
+	// 	subquery += `
+	// 		WHERE EXISTS(
+	// 			SELECT * 
+	// 			FROM MadeOf m2 JOIN Ingredients i ON m2.ingredientId = i.id
+	// 			WHERE i.ingredient like '%${inputIngredients}%' AND  d.dishId = m2.dishId
+	// 		)
+	// 	`;
+		
+	// }
+
+	// // Define query here
+	// const query = `
+	// 	SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
+	// 	FROM Dishes d
+	// 	'%${subquery}%'
+	// 	GROUP BY d.cuisine
+	// 	ORDER BY freq DESC;
+	// `;
 
 	// Keep connection in wider scope
 	let connection;

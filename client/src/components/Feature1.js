@@ -11,13 +11,13 @@ export default class Feature1 extends React.Component {
 
     this.state = {
       ingredientsOptions: [
-        { value: 'Egg', label: 'Egg' },
-        { value: 'Milk', label: 'Milk' },
-        { value: 'Beef', label: 'Beef' },
-        { value: 'Chicken', label: 'Chicken' },
-        { value: 'Rice', label: 'Rice' },
-        { value: 'Advocado', label: 'Advocado' },
-        { value: 'Potato', label: 'Potato' },
+        { value: 'egg', label: 'egg' },
+        { value: 'milk', label: 'milk' },
+        { value: 'beef', label: 'beef' },
+        { value: 'chicken', label: 'chicken' },
+        { value: 'rice', label: 'rice' },
+        { value: 'advocado', label: 'advocado' },
+        { value: 'potato', label: 'potato' },
       ],
       selectedIngredients: [],
       selectedIngredientDivs: [],
@@ -53,30 +53,26 @@ export default class Feature1 extends React.Component {
       { selectedIngredients },
       () => console.log(`Option selected:`, this.state.selectedIngredients)
     );
-    let data = {
-      value: selectedIngredients
-    }
-    await this.getCuisines(data);
+    console.log(selectedIngredients[0].value)
+    await this.getCuisines(selectedIngredients[0].value);
 
   };
 
   getCuisines = async selectedIngredients => {
     console.log('called getCuisines on', selectedIngredients)
     await fetch("http://localhost:8081/cuisines/" + selectedIngredients,{
-      method: "POST",
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(selectedIngredients)
+      method: "GET",
     }).then(async res => {
       return res.json();
     }, err => {
       console.warn(err);
     }).then(async result => {
-      console.log('matched cuisines',result.row)
-      let selectedIngredientDivs = result.row.map((cuisine, i) => {
+      console.log('matched cuisines',result.rows)
+      let selectedIngredientDivs = result.rows.map((cuisine, i) => {
         return (
           <div key={i} className="cuisine">
-              <div className="cuisineName">{cuisine[1]}</div>
-              <div className="matchingScore">{cuisine[2]}</div>
+              <div className="cuisineName">{cuisine[0]}</div>
+              <div className="matchingScore">{cuisine[1]}</div>
           </div>
         )
       });
