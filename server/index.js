@@ -15,7 +15,7 @@ app.get('/ingredients', routes.getAllIngredients);
 app.get('/cuisines', routes.getAllCuisines);
 
 /* ---- (matched cuisine) ---- */
-app.get('/cuisines/:cuisine', routes.getMatchedCuisine);
+app.get('/cuisines/:ingredients', routes.getMatchedCuisine);
 
 /* ---- (cuisine types) ---- */
 app.get('/cuisineTypes', routes.getAllCuisineTypes);

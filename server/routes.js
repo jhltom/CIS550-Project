@@ -140,15 +140,28 @@ async function getAllCuisines(req, res) {
 
 /* ---- (matched cuisine) ---- */
 async function getMatchedCuisine(req, res) {
+	const selectedIngredients = JSON.parse(req.body.ingredients);
+	console.log(selectedIngredients[0].value);
+	let subquery = ``;
+	for(i = 0; i < selectedIngredients.length; i++){
+		if(i > 0){
+			subquery += 'AND';
+		}
+		subquery += `
+			WHERE EXISTS(
+				SELECT * 
+				FROM MadeOf m2 JOIN Ingredients i ON m2.ingredientId = i.id
+				WHERE i.ingredient like '%${inputIngredients}%' AND  d.dishId = m2.dishId
+			)
+		`;
+		
+	}
+
 	// Define query here
 	const query = `
 		SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
 		FROM Dishes d
-		WHERE EXISTS(
-			SELECT * 
-			FROM MadeOf m2 JOIN Ingredients i ON m2.ingredientId = i.id
-			WHERE i.ingredient like '%${inputIngredients}%' AND  d.dishId = m2.dishId
-		)
+		'%${subquery}%'
 		GROUP BY d.cuisine
 		ORDER BY freq DESC;
 	`;

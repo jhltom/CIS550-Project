@@ -48,15 +48,43 @@ export default class Feature1 extends React.Component {
 
   }
 
-  handleChange = selectedIngredients => {
+  handleChange = async selectedIngredients => {
     this.setState(
       { selectedIngredients },
       () => console.log(`Option selected:`, this.state.selectedIngredients)
     );
-
-    //TODO: create selectedIngredientDivs for selectedIngredient 
+    let data = {
+      value: selectedIngredients
+    }
+    await this.getCuisines(data);
 
   };
+
+  getCuisines = async selectedIngredients => {
+    console.log('called getCuisines on', selectedIngredients)
+    await fetch("http://localhost:8081/cuisines/" + selectedIngredients,{
+      method: "POST",
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(selectedIngredients)
+    }).then(async res => {
+      return res.json();
+    }, err => {
+      console.warn(err);
+    }).then(async result => {
+      console.log('matched cuisines',result.row)
+      let selectedIngredientDivs = result.row.map((cuisine, i) => {
+        return (
+          <div key={i} className="cuisine">
+              <div className="cuisineName">{cuisine[1]}</div>
+              <div className="matchingScore">{cuisine[2]}</div>
+          </div>
+        )
+      });
+      this.setState({selectedIngredientDivs});
+    }, err => {
+      console.warn(err);
+    });
+  }
 
 
 
