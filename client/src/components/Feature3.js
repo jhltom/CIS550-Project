@@ -2,6 +2,7 @@ import React from 'react';
 import '../style/Feature3.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
+import Modal from "react-bootstrap/Modal";
 import Select from 'react-select';
 import PageNavbar from './PageNavbar';
 
@@ -25,7 +26,9 @@ export default class Feature3 extends React.Component {
         { value: 3, label: '3' },
         { value: 4, label: '4' },
         { value: 5, label: '5' },
-      ]
+      ],
+      show: false,
+      results: ""
     }
   }
 
@@ -117,25 +120,39 @@ export default class Feature3 extends React.Component {
 
   handleCuisineSelect = async selectedCuisine => {
     this.setState({ selectedCuisines: selectedCuisine });
-    console.log(this.state.selectedCuisines);
   }
 
   handleRadiusSelect = async selectedRadius => {
     this.setState({ radius: selectedRadius });
   }
 
+  handleShow = async () => this.setState({ show: true });
+  handleClose = async () => this.setState({ show: false });
+
   handleClick = async () => {
+    this.setState({ loading: true });
     let selection = this.state.selectedCuisines.map(cuisine => {
       return cuisine.value;
     });
     let data = {
       lat: this.state.lat,
       lng: this.state.lng,
-      radius: this.state.radius,
+      radius: this.state.radius.value,
       selection: selection
     }
 
-    console.log(data);
+    const response = await fetch("http://localhost:8081/restaurantsNearby",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({data: data})
+      }
+    );
+    const body = await response.json();
+    this.setState({ loading: false, results: body.rows });
+    this.handleShow();
   }
 
   render() {
@@ -181,6 +198,25 @@ export default class Feature3 extends React.Component {
 
         <div id="gmap" ref={this.googleMap}>
         </div>
+
+        <Modal show={this.state.show} onHide={this.handleClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Results</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>This is a work in progress:
+            <br></br>
+            {this.state.results}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.handleClose}>
+              Close
+            </Button>
+            <Button variant="primary" onClick={this.handleClose}>
+              Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
       </div>
     );
   }
