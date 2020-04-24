@@ -391,7 +391,7 @@ async function getNearbyRestaurants(req, res) {
 		`;
 	}
 
-	console.log("QUERY: " + query);
+	// console.log("QUERY: " + query);
 
 	// Keep connection in wider scope
 	let connection;
@@ -426,20 +426,69 @@ async function getNearbyRestaurants(req, res) {
 }
 
 /* ---- (cuisines strictly not using selected ingredients) ---- */
-async function test(req, res) {
-	console.log("POST received");
-	console.log(req.body);
+async function getCuisinesMinusIngredients(req, res) {
+	const data = req.body.data;
+	const ingredientIds = data.selection;
+
+	const query = `
+		WITH cimap AS (
+			SELECT DISTINCT ct.cuisine, ingredientId
+			FROM CuisineType ct
+			JOIN Dishes d ON ct.cuisine = d.cuisine
+			JOIN MadeOf mo ON mo.dishId = d.dishId
+		) SELECT DISTINCT cuisine
+		FROM cimap c
+		WHERE NOT EXISTS (
+			SELECT *
+			FROM cimap
+			WHERE cuisine = c.cuisine
+			AND ingredientId IN (${ingredientIds.join(",")})
+		)
+	`;
+
+	// Keep connection in wider scope
+	let connection;
+
+	try {
+		// Get connection pool
+		let pool = await getPool();
+
+		// Obtain single connection from pool
+		connection = await pool.getConnection();
+
+		// Query the db
+		let result = await connection.execute(query);
+
+		// Send response
+		console.log("Result: ", result);
+		res.json(result);
+
+	} catch (e) {
+		console.log(e);
+
+	} finally {
+		if (connection) {
+			try {
+				// Close connection and return it to the pool
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
 }
 
 // Cleanup function
 async function cleanup() {
-	console.log("NOT IMPLEMENTED YET");
+	if (pool) await pool.close();
+	return;
 }
 
 
 // Export functions to be used elsewhere serverside
 module.exports = {
 	test: test,
+	cleanup: cleanup,
     getAllIngredients: getAllIngredients,
     getAllCuisines: getAllCuisines,
 	getMatchedCuisine: getMatchedCuisine,
@@ -447,4 +496,5 @@ module.exports = {
 	getRestaurantsWithCuisine: getRestaurantsWithCuisine,
 	getRelatedCuisines: getRelatedCuisines,
 	getNearbyRestaurants: getNearbyRestaurants,
+	getCuisinesMinusIngredients: getCuisinesMinusIngredients,
 }
