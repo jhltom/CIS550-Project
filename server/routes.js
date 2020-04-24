@@ -321,8 +321,76 @@ async function getNearbyRestaurants(req, res) {
 	const userLng = data.lng;
 	const userLat = data.lat;
 	const radius = data.radius;
+	const selectedIds = data.selection;
 
-	console.log(data);
+	let query;
+
+	if (selectedIds.length) {
+		query = `
+			WITH filtered AS (
+				SELECT businessId as id
+				FROM Serve
+				WHERE cuisineId IN(${selectedIds.join(",")})
+			), dist AS (
+				SELECT businessId AS id, name, address, latitude,
+				longitude, stars, reviewcount,
+				(3959 * ACOS(COS(${userLat} * 0.01745329251) * COS(latitude * 0.01745329251) * COS((longitude - ${userLng}) * 0.01745329251) + SIN(${userLat} * 0.01745329251) * SIN(latitude * 0.01745329251))) AS distance
+				FROM Restaurants
+				WHERE businessId IN (
+					SELECT *
+					FROM filtered
+				)
+			) SELECT id, name, address, latitude, longitude, stars, reviewcount, distance
+			FROM dist
+			WHERE distance <= ${radius}
+			ORDER BY distance
+		`;
+	} else {
+		query = `
+			WITH dist AS (
+				SELECT businessId AS id, name, address, latitude,
+				longitude, stars, reviewcount,
+				(3959 * ACOS(COS(${userLat} * 0.01745329251) * COS(latitude * 0.01745329251) * COS((longitude - ${userLng}) * 0.01745329251) + SIN(${userLat} * 0.01745329251) * SIN(latitude * 0.01745329251))) AS distance
+				FROM Restaurants
+			) SELECT id, name, address, latitude, longitude, stars, reviewcount, distance
+			FROM dist
+			WHERE distance <= ${radius}
+			ORDER BY distance
+		`;
+	}
+
+	console.log("QUERY: " + query);
+
+	// Keep connection in wider scope
+	let connection;
+
+	try {
+		// Get connection pool
+		let pool = await getPool();
+
+		// Obtain single connection from pool
+		connection = await pool.getConnection();
+
+		// Query the db
+		let result = await connection.execute(query);
+
+		// Send response
+		console.log("Result: ", result);
+		res.json(result);
+
+	} catch (e) {
+		console.log(e);
+
+	} finally {
+		if (connection) {
+			try {
+				// Close connection and return it to the pool
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
 }
 
 /* ---- (cuisines strictly not using selected ingredients) ---- */
