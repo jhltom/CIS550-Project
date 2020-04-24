@@ -29,8 +29,11 @@ app.get('/cuisineRestaurants/:cuisineType/:day', routes.getRestaurantsWithCuisin
 /* ---- (top 5 related cuisine to a given cuisine) ---- */
 app.get('/relatedCuisines/:cuisineId', routes.getRelatedCuisines);
 
-/* ---- (top 5 related cuisine to a given cuisine) ---- */
+/* ---- (restaurants within user-specified distance of user GPS) ---- */
 app.post('/restaurantsNearby', routes.getNearbyRestaurants);
+
+/* ---- (cuisines strictly not using selected ingredients) ---- */
+app.post('/getCuisinesWithout', routes.getCuisinesMinusIngredients);
 
 // Test endpoint
 app.get('/test', routes.test);
