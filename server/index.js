@@ -1,4 +1,5 @@
 // const process = require("process");
+const bodyParser = require('body-parser');
 const express = require("express");
 const routes = require("./routes.js");
 const cors = require('cors');
@@ -6,6 +7,8 @@ const cors = require('cors');
 const app = express();
 const PORT = 8081;
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 
 /* ---- (ingredients) ---- */
@@ -25,6 +28,9 @@ app.get('/cuisineRestaurants/:cuisineType/:day', routes.getRestaurantsWithCuisin
 
 /* ---- (top 5 related cuisine to a given cuisine) ---- */
 app.get('/relatedCuisines/:cuisineId', routes.getRelatedCuisines);
+
+/* ---- (top 5 related cuisine to a given cuisine) ---- */
+app.post('/restaurantsNearby', routes.getNearbyRestaurants);
 
 // Test endpoint
 app.get('/test', routes.test);

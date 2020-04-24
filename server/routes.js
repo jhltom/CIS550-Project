@@ -317,8 +317,12 @@ async function getRelatedCuisines(req, res) {
 
 /* ---- (restaurants within user-specified distance of user GPS) ---- */
 async function getNearbyRestaurants(req, res) {
-	console.log("POST received");
-	console.log(req.body);
+	const data = req.body.data;
+	const userLng = data.lng;
+	const userLat = data.lat;
+	const radius = data.radius;
+
+	console.log(data);
 }
 
 /* ---- (cuisines strictly not using selected ingredients) ---- */
@@ -342,4 +346,5 @@ module.exports = {
 	getAllCuisineTypes: getAllCuisineTypes,
 	getRestaurantsWithCuisine: getRestaurantsWithCuisine,
 	getRelatedCuisines: getRelatedCuisines,
+	getNearbyRestaurants: getNearbyRestaurants,
 }
