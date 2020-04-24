@@ -261,6 +261,7 @@ async function getRestaurantsWithCuisine(req, res) {
 		)
 		SELECT *
 		FROM Temp r JOIN Hours h ON r.businessId = h.businessId
+		ORDER BY r.name
 	`;
 	let connection;
 
