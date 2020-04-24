@@ -96,7 +96,7 @@ export default class Feature2 extends React.Component {
 
         if (restaurant[3] === 'CA') time = new Date(utc + (3600000 * -7));
         else time = new Date(utc + (3600000 * -4));
-        const timeFormatted = Number(String(time.getHours()) + String(time.getMinutes()))
+        const timeFormatted = Number(String(time.getHours()).padStart(2, '0') + String(time.getMinutes()).padStart(2, '0'))
 
         let isOpen;
 
@@ -112,6 +112,9 @@ export default class Feature2 extends React.Component {
             <div className="cuisineType">{selectedCuisine}</div>
             <div className="address">{restaurant[2]}</div>
             {isOpen ? <div className="open">Open</div> : <div className="open">Closed</div> }
+            <div className="startTime">{restaurant[6]}</div>
+            <div className="endTime">{restaurant[7]}</div>
+            <div className="currTime">{timeFormatted}</div>
           </div>
         )
       });
@@ -147,6 +150,9 @@ export default class Feature2 extends React.Component {
               <div className="header"><strong>Cuisine Type</strong></div>
               <div className="header"><strong>Address</strong></div>
               <div className="header"><strong>Open/Closed</strong></div>
+              <div className="header"><strong>Start At</strong></div>
+              <div className="header"><strong>Close At</strong></div>
+              <div className="header"><strong>Curr Time</strong></div>
             </div>
           </div>
 

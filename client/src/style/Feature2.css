@@ -8,7 +8,12 @@
 .headers .header, .restaurant .restaurantName,
 .restaurant .cuisineType, .restaurant .address,
 .restaurant .open {
-  flex: 1 0 25%;
+  flex: 1 0 14%;
+}
+
+.restaurant .startTime, .restaurant .endTime, 
+.restaurant .currTime {
+  flex: 1 0 14%;
 }
 .restaurant .address {
   font-size: 12px;
