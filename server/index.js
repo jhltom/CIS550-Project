@@ -38,10 +38,30 @@ app.post('/getCuisinesWithout', routes.getCuisinesMinusIngredients);
 // Test endpoint
 app.get('/test', routes.test);
 
-app.listen(PORT, () => {
+
+const server = app.listen(PORT, () => {
   console.log(`Server listening on PORT ${PORT}`);
 });
 
+
 // Cleanup methods on process termination
-// process.on('SIGINT', routes.cleanup);
-// process.on('SIGTERM', routes.cleanup);
+function exitHandler() {
+	console.log("Closing server...");
+	server.close(() => {
+		console.log("Server closed.");
+		console.log("Closing connection pool...");
+		routes.cleanup().then(() => {
+			console.log("Pool closed.");
+			process.exit(0);
+		});
+	});
+}
+
+process.on('SIGTERM', () => {
+	console.log("SIGTERM Received.");
+	exitHandler();
+});
+process.on('SIGINT', () => {
+	console.log("SIGINT Received.");
+	exitHandler();
+});

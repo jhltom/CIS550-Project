@@ -448,13 +448,15 @@ async function getCuisinesMinusIngredients(req, res) {
 
 // Cleanup function
 async function cleanup() {
-	console.log("NOT IMPLEMENTED YET");
+	if (pool) await pool.close();
+	return;
 }
 
 
 // Export functions to be used elsewhere serverside
 module.exports = {
 	test: test,
+	cleanup: cleanup,
     getAllIngredients: getAllIngredients,
     getAllCuisines: getAllCuisines,
 	getMatchedCuisine: getMatchedCuisine,
