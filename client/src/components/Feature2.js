@@ -93,20 +93,27 @@ export default class Feature2 extends React.Component {
       const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
       let time;
       let selectedCuisineDivs = result.rows.map((restaurant, i) => {
+
         if (restaurant[3] === 'CA') time = new Date(utc + (3600000 * -7));
         else time = new Date(utc + (3600000 * -4));
         const timeFormatted = Number(String(time.getHours()) + String(time.getMinutes()))
 
+        let isOpen;
+
         if (restaurant[6] < timeFormatted && timeFormatted < restaurant[7]) {
-          console.log("Start:", restaurant[6], " End:", restaurant[7], " CurrTime:", timeFormatted)
-          return (
-            <div key={i} className="restaurant">
-              <div className="restaurantName">{restaurant[1]}</div>
-              <div className="cuisineType">{selectedCuisine}</div>
-              <div className="address">{restaurant[2]}</div>
-            </div>
-          )
+          isOpen = true;
+        } else {
+          isOpen = false
         }
+        console.log("Start:", restaurant[6], " End:", restaurant[7], " CurrTime:", timeFormatted)
+        return (
+          <div key={i} className="restaurant">
+            <div className="restaurantName">{restaurant[1]}</div>
+            <div className="cuisineType">{selectedCuisine}</div>
+            <div className="address">{restaurant[2]}</div>
+            {isOpen ? <div className="open">Open</div> : <div className="open">Closed</div> }
+          </div>
+        )
       });
       this.setState({ selectedCuisineDivs });
     }, err => {
@@ -139,6 +146,7 @@ export default class Feature2 extends React.Component {
               <div className="header"><strong>Retaurant</strong></div>
               <div className="header"><strong>Cuisine Type</strong></div>
               <div className="header"><strong>Address</strong></div>
+              <div className="header"><strong>Open/Closed</strong></div>
             </div>
           </div>
 
