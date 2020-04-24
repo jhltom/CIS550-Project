@@ -7,6 +7,7 @@ import {
 import Home from './components/Home';
 import Feature1 from './components/Feature1';
 import Feature2 from './components/Feature2';
+import Feature3 from './components/Feature3';
 import './App.css';
 
 function App() {
@@ -40,6 +41,13 @@ function App() {
 						path="/Feature1"
 						render={() => (
 							<Feature1 />
+						)}
+					/>
+					<Route
+						exact
+						path="/Feature3"
+						render={() => (
+							<Feature3 />
 						)}
 					/>
 				</Switch>
