@@ -6,7 +6,7 @@
   }
   
   .headers .header, 
-  .cuisine .cuisineName, .cuisine .suitability
+  .cuisine .cuisineName, .cuisine .matchingScore
    {
-    flex: 1 0 25%;
+    flex: 1 0 50%;
   }

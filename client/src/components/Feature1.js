@@ -1,6 +1,8 @@
 import React from 'react';
 import '../style/Feature1.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Button from 'react-bootstrap/Button';
+import Modal from "react-bootstrap/Modal";
 import Select from 'react-select';
 import PageNavbar from './PageNavbar';
 
@@ -19,7 +21,7 @@ export default class Feature1 extends React.Component {
         { value: 'advocado', label: 'advocado' },
         { value: 'potato', label: 'potato' },
       ],
-      selectedIngredients: null,
+      selectedIngredients: [],
       selectedIngredientDivs: [],
     }
   }
@@ -45,6 +47,7 @@ export default class Feature1 extends React.Component {
 
     //   ];
     // this.setState({ selectedIngredientDivs });
+    //await this.getCuisines();
     await this.getAllIngredients();
 
   }
@@ -78,36 +81,55 @@ export default class Feature1 extends React.Component {
 
   handleChange = async selectedIngredients => {
     this.setState(
-      { selectedIngredients },
+      { selectedIngredients},
       () => console.log(`Option selected:`, this.state.selectedIngredients)
     );
-    console.log(selectedIngredients.value)
-    await this.getCuisines(selectedIngredients.value);
-
+    await this.getCuisines(selectedIngredients);
   };
 
   getCuisines = async selectedIngredients => {
-    console.log('called getCuisines on', selectedIngredients)
-    await fetch("http://localhost:8081/cuisines/" + selectedIngredients,{
-      method: "GET",
-    }).then(async res => {
-      return res.json();
-    }, err => {
-      console.warn(err);
-    }).then(async result => {
-      console.log('matched cuisines',result.rows)
-      let selectedIngredientDivs = result.rows.map((cuisine, i) => {
-        return (
-          <div key={i} className="cuisine">
-              <div className="cuisineName">{cuisine[0]}</div>
-              <div className="matchingScore">{cuisine[1]}</div>
-          </div>
-        )
+    console.log('selected: ', selectedIngredients)
+    if(selectedIngredients != null && selectedIngredients.length){
+      let selection = selectedIngredients.map(ingredient => {
+        return ingredient.value;
       });
-      this.setState({selectedIngredientDivs});
-    }, err => {
-      console.warn(err);
-    });
+      console.log('let lelection:', selection);
+      let data = {selection:selection}
+      console.log('data:', data);
+      await fetch("http://localhost:8081/matchedCuisines", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({data: data})
+      }).then(async res => {
+        return res.json();
+      }, err => {
+        console.warn(err);
+      }).then(async result => {
+        console.log('matched cuisines',result.rows);
+        let selectedIngredientDivs = result.rows.map((cuisine, i) => {
+          return (
+            <div key={i} className="cuisine">
+                <div className="cuisineName">{cuisine[0]}</div>
+                <div className="matchingScore">{cuisine[1]}</div>
+            </div>
+          )
+        });
+        this.setState({selectedIngredientDivs});
+      }, err => {
+        console.warn(err);
+      });
+    }
+    else{
+      let selectedIngredientDivs = [
+      <div className="cuisine">
+        <div className="cuisineName"></div>
+        <div className="matchingScore"></div>
+      </div>
+      ];
+    this.setState({ selectedIngredientDivs });
+    }
   }
 
 
@@ -122,7 +144,7 @@ export default class Feature1 extends React.Component {
             value={this.state.selectedIngredients}
             onChange={this.handleChange}
             options={this.state.ingredientsOptions}
-            //isMulti
+            isMulti
             isSearchable
             placeholder="Select ingredient(s) ... "
           />

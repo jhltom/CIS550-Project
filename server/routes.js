@@ -67,7 +67,7 @@ async function test(req, res) {
 /* ---- (ingredients) ---- */
 async function getAllIngredients(req, res) {
 	// Define query here
-	const query = `SELECT DISTINCT ingredient from ingredients WHERE rownum <= 1000`;
+	const query = `SELECT DISTINCT ingredient from ingredients WHERE rownum <= 7000`;
 
 	// Keep connection in wider scope
 	let connection;
@@ -141,49 +141,63 @@ async function getAllCuisines(req, res) {
 /* ---- (matched cuisine) ---- */
 async function getMatchedCuisine(req, res) {
 
-	const selectedIngredients = req.params.ingredients;
-	console.log(selectedIngredients);
+	// const selectedIngredients = req.params.ingredients;
+	// console.log(selectedIngredients);
 
 	// Define query here
-	const query = `
-		SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
-		FROM Dishes d
-		WHERE EXISTS(
-			SELECT * 
-			FROM MadeOf m2 JOIN Ingredients i ON m2.ingredientId = i.id
-			WHERE i.ingredient like '${selectedIngredients}' AND  d.dishId = m2.dishId
-		)
-		GROUP BY d.cuisine
-		ORDER BY freq DESC
-	`;
-	console.log(query);
-
-	// console.log(req.body);
-	// console.log(JSON.parse(req.body));
-	// const selectedIngredients = req.params.data;
-	// let subquery = ``;
-	// for(i = 0; i < selectedIngredients.length; i++){
-	// 	if(i > 0){
-	// 		subquery += 'AND';
-	// 	}
-	// 	subquery += `
-	// 		WHERE EXISTS(
-	// 			SELECT * 
-	// 			FROM MadeOf m2 JOIN Ingredients i ON m2.ingredientId = i.id
-	// 			WHERE i.ingredient like '%${inputIngredients}%' AND  d.dishId = m2.dishId
-	// 		)
-	// 	`;
-		
-	// }
-
-	// // Define query here
 	// const query = `
 	// 	SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
 	// 	FROM Dishes d
-	// 	'%${subquery}%'
+	// 	WHERE EXISTS(
+	// 		SELECT * 
+	// 		FROM MadeOf m2 JOIN Ingredients i ON m2.ingredientId = i.id
+	// 		WHERE i.ingredient like '${selectedIngredients}' AND  d.dishId = m2.dishId
+	// 	)
 	// 	GROUP BY d.cuisine
-	// 	ORDER BY freq DESC;
+	// 	ORDER BY freq DESC
 	// `;
+	// console.log(query);
+	console.log('call getMatchedCuisine on server');
+	console.log(req.body.data);
+	console.log('after print');
+	const selectedIngredients = req.body.data.selection;
+	let subquery = ``;
+	for(i = 0; i < selectedIngredients.length; i++){
+		if(i > 0){
+			subquery += 'AND';
+		}
+		subquery += `
+			EXISTS(
+				SELECT * 
+				FROM MadeOf m2 JOIN Ingredients i ON m2.ingredientId = i.id
+				WHERE i.ingredient like '%${selectedIngredients[i]}%' AND  d.dishId = m2.dishId
+			)
+		`;
+		
+	}
+
+	// Define query here
+	let query = ``;
+	console.log('length:', selectedIngredients.length);
+	if(selectedIngredients.length){
+		query = `
+		SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
+		FROM Dishes d
+		WHERE ${subquery}
+		GROUP BY d.cuisine
+		ORDER BY freq DESC
+	`;
+	}
+	else{
+		query = `
+		SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
+		FROM Dishes d
+		GROUP BY d.cuisine
+		ORDER BY freq DESC
+	`;
+	}
+	console.log(query);
+	
 
 	// Keep connection in wider scope
 	let connection;
@@ -201,7 +215,7 @@ async function getMatchedCuisine(req, res) {
 		// Send response
 		console.log("Result: ", result);
 		res.json(result);
-
+		
 	} catch (e) {
 		console.log(e);
 
@@ -242,31 +256,6 @@ async function getAllCuisineTypes(req, res) {
 	}
 }
 
-/* ---- (cuisine types) ---- */
-async function getAllCuisineTypesFull(req, res) {
-
-	const query = `SELECT * FROM CuisineType`;
-	let connection;
-
-	try {
-		let pool = await getPool();
-		connection = await pool.getConnection();
-		let result = await connection.execute(query);
-		// console.log("Result: ", result);
-		res.json(result);
-	} catch (e) {
-		console.log(e);
-	} finally {
-		if (connection) {
-			try {
-				await connection.close();
-			} catch(e) {
-				console.log("Failed to close connection");
-			}
-		}
-	}
-}
-
 /* ---- (restaurants with given cuisine) ---- */
 async function getRestaurantsWithCuisine(req, res) {
 	const cuisineType = req.params.cuisineType;
@@ -286,7 +275,6 @@ async function getRestaurantsWithCuisine(req, res) {
 		)
 		SELECT *
 		FROM Temp r JOIN Hours h ON r.businessId = h.businessId
-		ORDER BY r.name
 	`;
 	let connection;
 
@@ -519,7 +507,6 @@ module.exports = {
     getAllCuisines: getAllCuisines,
 	getMatchedCuisine: getMatchedCuisine,
 	getAllCuisineTypes: getAllCuisineTypes,
-	getAllCuisineTypesFull: getAllCuisineTypesFull,
 	getRestaurantsWithCuisine: getRestaurantsWithCuisine,
 	getRelatedCuisines: getRelatedCuisines,
 	getNearbyRestaurants: getNearbyRestaurants,

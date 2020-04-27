@@ -18,13 +18,14 @@ app.get('/ingredients', routes.getAllIngredients);
 app.get('/cuisines', routes.getAllCuisines);
 
 /* ---- (matched cuisine) ---- */
-app.get('/cuisines/:ingredients', routes.getMatchedCuisine);
+// app.post('/cuisines/:ingredients', routes.getMatchedCuisine);
+app.post('/matchedCuisines', routes.getMatchedCuisine);
 
 /* ---- (cuisine types) ---- */
 app.get('/cuisineTypes', routes.getAllCuisineTypes);
 
 /* ---- (cuisine types) ---- */
-app.get('/cuisineTypesFull', routes.getAllCuisineTypesFull);
+// app.get('/cuisineTypesFull', routes.getAllCuisineTypesFull);
 
 /* ---- (restaurants with given cuisine) ---- */
 app.get('/cuisineRestaurants/:cuisineType/:day', routes.getRestaurantsWithCuisine);
