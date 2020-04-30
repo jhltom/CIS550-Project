@@ -8,6 +8,7 @@ import Home from './components/Home';
 import Feature1 from './components/Feature1';
 import Feature2 from './components/Feature2';
 import Feature3 from './components/Feature3';
+import SearchPage from './components/SearchPage';
 import './App.css';
 
 function App() {
@@ -49,6 +50,14 @@ function App() {
 						render={() => (
 							<Feature3 />
 						)}
+					/>
+					<Route
+						exact
+						path="/Search"
+						render={() => (
+							<SearchPage />
+						)}
+					/>
 					/>
 				</Switch>
 			</Router>

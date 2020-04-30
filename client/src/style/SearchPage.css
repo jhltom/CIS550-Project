@@ -1,0 +1,57 @@
+.SearchPage-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  min-height: 100vh;  
+  height: 100%;
+  width: 100%;
+  min-height: 100vh;  
+  align-items: center;
+  justify-content: center;
+  background-color: #282c34;
+}
+.SearchPage-container .searchBar-container {
+  /* flex: 1; */
+  width: 80%;
+  /* background: red; */
+}
+.SearchPage-container .header {
+  /* background: green; */
+  padding:1em;
+  width: 100%;
+}
+.SearchPage-container .empty {
+  /* background: blue; */
+  width: 100%;
+  padding:5em;
+}
+.rows2 {
+  display: flex;
+  justify-content: center;
+}
+.rows {
+  display: flex;
+  margin: 1%
+}
+
+
+
+.SearchPage-logo {
+  height: 20vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .SearchPage-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
