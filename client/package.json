@@ -10,8 +10,13 @@
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.0",
     "react-dom": "^16.13.1",
+    "react-multi-select-component": "^2.0.4",
+    "react-native-elements": "^2.0.0",
+    "react-native-paper": "^3.9.0",
+    "react-native-search-bar": "^3.5.1",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
+    "react-search-box": "^2.0.2",
     "react-select": "^3.1.0"
   },
   "scripts": {

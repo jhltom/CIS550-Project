@@ -101,6 +101,49 @@ async function getAllIngredients(req, res) {
 	}
 }
 
+/* ---- (SearchedIngredient) ---- */
+async function getSearchedIngredient(req, res) {
+	let search = req.params.search;
+	// Define query here
+	const query = `
+		SELECT DISTINCT ingredient 
+		FROM ingredients
+		WHERE ingredient LIKE '%${search} %' OR ingredient LIKE '% ${search}%' 
+		OR ingredient LIKE '%${search}s%' OR ingredient LIKE '%${search}es%' OR ingredient = '${search}'
+	`;
+
+	// Keep connection in wider scope
+	let connection;
+
+	try {
+		// Get connection pool
+		let pool = await getPool();
+
+		// Obtain single connection from pool
+		connection = await pool.getConnection();
+
+		// Query the db
+		let result = await connection.execute(query);
+
+		// Send response
+		console.log("Result: ", result);
+		res.json(result);
+
+	} catch (e) {
+		console.log(e);
+
+	} finally {
+		if (connection) {
+			try {
+				// Close connection and return it to the pool
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+}
+
 /* ---- (cuisine) ---- */
 async function getAllCuisines(req, res) {
 	// Define query here
@@ -140,23 +183,6 @@ async function getAllCuisines(req, res) {
 
 /* ---- (matched cuisine) ---- */
 async function getMatchedCuisine(req, res) {
-
-	// const selectedIngredients = req.params.ingredients;
-	// console.log(selectedIngredients);
-
-	// Define query here
-	// const query = `
-	// 	SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
-	// 	FROM Dishes d
-	// 	WHERE EXISTS(
-	// 		SELECT * 
-	// 		FROM MadeOf m2 JOIN Ingredients i ON m2.ingredientId = i.id
-	// 		WHERE i.ingredient like '${selectedIngredients}' AND  d.dishId = m2.dishId
-	// 	)
-	// 	GROUP BY d.cuisine
-	// 	ORDER BY freq DESC
-	// `;
-	// console.log(query);
 	console.log('call getMatchedCuisine on server');
 	console.log(req.body.data);
 	console.log('after print');
@@ -503,7 +529,8 @@ async function cleanup() {
 module.exports = {
 	test: test,
 	cleanup: cleanup,
-    getAllIngredients: getAllIngredients,
+	getAllIngredients: getAllIngredients,
+	getSearchedIngredient: getSearchedIngredient,
     getAllCuisines: getAllCuisines,
 	getMatchedCuisine: getMatchedCuisine,
 	getAllCuisineTypes: getAllCuisineTypes,

@@ -1,9 +1,8 @@
 import React from 'react';
 import '../style/Feature1.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Button from 'react-bootstrap/Button';
-import Modal from "react-bootstrap/Modal";
 import Select from 'react-select';
+import ReactSearchBox from 'react-search-box'
 import PageNavbar from './PageNavbar';
 
 export default class Feature1 extends React.Component {
@@ -12,42 +11,17 @@ export default class Feature1 extends React.Component {
     super(props);
 
     this.state = {
-      ingredientsOptions: [
-        { value: 'egg', label: 'egg' },
-        { value: 'milk', label: 'milk' },
-        { value: 'beef', label: 'beef' },
-        { value: 'chicken', label: 'chicken' },
-        { value: 'rice', label: 'rice' },
-        { value: 'advocado', label: 'advocado' },
-        { value: 'potato', label: 'potato' },
-      ],
+      ingredientsOptions: [],
       selectedIngredients: [],
       selectedIngredientDivs: [],
+      search: null,
+      options: [],
+      selectedOptions:[],
     }
   }
-
+  
   componentDidMount = async () => {
 
-    // TODO: get of all ingredients from Ingredients db
-
-    // For now for testing purposes: 
-    // let selectedIngredientDivs = [
-    //   <div className="cuisine">
-    //     <div className="cuisineName">American</div>
-    //     <div className="suitability">90%</div>
-    //   </div>,
-    //   <div className="cuisine">
-    //   <div className="cuisineName">Italian</div>
-    //   <div className="suitability">77%</div>
-    // </div>,
-    //     <div className="cuisine">
-    //     <div className="cuisineName">Korean</div>
-    //     <div className="suitability">5%</div>
-    // </div>
-
-    //   ];
-    // this.setState({ selectedIngredientDivs });
-    //await this.getCuisines();
     await this.getAllIngredients();
 
   }
@@ -67,17 +41,49 @@ export default class Feature1 extends React.Component {
           label: ingredient
         })
       });
-      // ingredientsOptions.sort((x, y) => {
-      //   const X = x.value;
-      //   const Y = y.value;
-      //   return X < Y ? -1 : X > Y ? 1 : 0;
-      // });
       this.setState({ingredientsOptions});
       console.log(ingredientsOptions);
     }, err => {
       console.log(err);
     });
   }
+
+  handleSearchChange = search => {
+    this.setState(
+      { search },
+      () => console.log('search:', this.state.search)
+    );
+  };
+
+  getSearchedIngredient = () => {
+    fetch("http://localhost:8081/searchedIngredient/" + this.state.search,{
+      method: 'GET'
+    }).then(res => {
+      return res.json();
+    }, err => {
+      console.log(err);
+    }).then(result => {
+      let options = result.rows.map((row, i) => {
+        const option = row[0].trim();
+        return ({
+          value: option,
+          label: option
+        })
+      });
+      this.setState({options});
+      console.log(options);
+    }, err => {
+      console.log(err);
+    });
+  }
+
+  handleAddChange = search => {
+    this.setState(
+      { search },
+      () => console.log('search:', this.state.search)
+    );
+  };
+
 
   handleChange = async selectedIngredients => {
     this.setState(
@@ -132,7 +138,9 @@ export default class Feature1 extends React.Component {
     }
   }
 
-
+  handleClick = () => {
+    console.log('no repeating!!!');
+  }
 
   render() {
     return (
@@ -140,13 +148,36 @@ export default class Feature1 extends React.Component {
         <PageNavbar active="Feature1" />
         <div className="container">
 
+          <ReactSearchBox
+            placeholder="Search ingredients"
+            onChange={this.handleSearchChange}
+            value={this.state.search}
+          />
+
+          <button onClick={this.getSearchedIngredient}>
+            Submit
+          </button>
+
+          <Select
+            //value={this.state.options}
+            //onChange={this.handleChange}
+            options={this.state.options}
+            isMulti
+            isSearchable
+            placeholder="Select ingredient(s) ... "
+          />
+
+          <button onClick={this.getSearchedIngredient}>
+            Add To List
+          </button>
+
           <Select
             value={this.state.selectedIngredients}
             onChange={this.handleChange}
             options={this.state.ingredientsOptions}
             isMulti
             isSearchable
-            placeholder="Select ingredient(s) ... "
+            placeholder="See and select from all ingredients ... "
           />
 
           <div className="header-container">

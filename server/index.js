@@ -14,6 +14,9 @@ app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 /* ---- (ingredients) ---- */
 app.get('/ingredients', routes.getAllIngredients);
 
+/* ---- (searchedIngredient) ---- */
+app.get('/searchedIngredient/:search', routes.getSearchedIngredient);
+
 /* ---- (cuisine) ---- */
 app.get('/cuisines', routes.getAllCuisines);
 
