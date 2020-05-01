@@ -6,6 +6,7 @@ import Select from 'react-select';
 import '../style/SearchPage.css';
 import { FaSearch } from 'react-icons/fa';
 import { TiHeartFullOutline, TiLocation } from "react-icons/ti";
+import ReactSearchBox from 'react-search-box'
 
 
 export default class SearchPage extends React.Component {
@@ -34,7 +35,8 @@ export default class SearchPage extends React.Component {
       selectedCuisines: [],
       selectedLocation: "",
 
-      ingredientOptions: [
+      // ingredients states
+      ingredientsOptions: [
         { value: 'milk', label: 'milk'},
         { value: 'flower', label: 'flower'},
         { value: 'peach', label: 'peach'},
@@ -43,8 +45,10 @@ export default class SearchPage extends React.Component {
         { value: 'curry', label: 'curry'},
         { value: 'toufu', label: 'toufu'},
       ],
-      selectedIngredients: []
-
+      search: null,
+      selectedIngredients: [],
+      selectedOptions: [],
+      matchedCuisines: []
     }
   }
 
@@ -64,11 +68,40 @@ export default class SearchPage extends React.Component {
     this.setState({ toggleSearch: !this.state.toggleSearch });
   }
 
+
+  // ingredinets search
   handleIngredientsChange = (selectedIngredients) => {
     this.setState(
       { selectedIngredients },
       () => console.log('ingredients selected:', this.state.selectedIngredients)
     );
+  }
+  handleSearchChange = (search) => {
+    this.setState(
+      { search },
+      () => console.log('search:', this.state.search)
+    );
+  }
+  getSearchedIngredient = () => {
+    fetch("http://localhost:8081/searchedIngredient/" + this.state.search,{
+      method: 'GET'
+    }).then(res => {
+      return res.json();
+    }, err => {
+      console.log(err);
+    }).then(result => {
+      let options = result.rows.map((row, i) => {
+        const option = row[0].trim();
+        return ({
+          value: option,
+          label: option
+        })
+      });
+      this.setState({ingredientsOptions: options});
+      console.log(options);
+    }, err => {
+      console.log(err);
+    });
   }
 
 
@@ -79,9 +112,7 @@ export default class SearchPage extends React.Component {
         <div className="header">
           <img src={logo} className="SearchPage-logo" alt="logo" />
         </div>
-
         <div className="searchBar-container">
-
           {this.state.toggleSearch ?
             <div className="rows2">
               <Button variant="secondary" onClick={this.handleSearchToggle}> <FaSearch /> Ingredients</Button>
@@ -128,30 +159,33 @@ export default class SearchPage extends React.Component {
             :
 
             // search by ingredients: by Zhongyang
-            <div className="rows">
+            <div className="rows">                   
+
+              <Button type="submit" onClick={this.getSearchedIngredient}>
+                Search
+              </Button>              
+
+              <ReactSearchBox
+                placeholder="Search Keyword..."
+                onChange={this.handleSearchChange}
+                value={this.state.search}
+              />  
+
+              <div > &nbsp; &nbsp;</div>
+
               <InputGroup.Text id="inputGroupPrepend"> <TiHeartFullOutline/> </InputGroup.Text>
               <Select
                 isMulti
                 styles={selectStyles}
-                value={this.state.selectedIngredients}
+                //value={this.state.selectedIngredients}
                 isSearchable
                 placeholder="Select ingredient(s) ... "
                 size={50}
-                options={this.state.ingredientOptions}
-                onChange={this.handleIngredientsChange}
+                options={this.state.ingredientsOptions}
+                //onChange={this.handleIngredientsChange}
               />
-              <div > &nbsp; &nbsp;</div>
-              {/* <InputGroup.Text id="inputGroupPrepend"> <TiLocation/> </InputGroup.Text>
-              <Select
-                styles={selectStyles}
-                value={this.state.selectedLocation}
-                placeholder="Select location ... "
-                size={50}
-                options={this.state.locationOptions}
-                onChange={this.handleLocationChange}
-              /> */}
-              <div > &nbsp; &nbsp;</div>
-              <Button type="submit">Search</Button>
+              <Button type="submit">See Cuisines</Button>
+              
             </div>
           
           
