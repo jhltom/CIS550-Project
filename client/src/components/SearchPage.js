@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Badge, Button, InputGroup } from 'react-bootstrap';
 import Select from 'react-select';
 import '../style/SearchPage.css';
+import { FaSearch } from 'react-icons/fa';
+import { TiHeartFullOutline, TiLocation } from "react-icons/ti";
 
 
 export default class SearchPage extends React.Component {
@@ -65,15 +67,15 @@ export default class SearchPage extends React.Component {
 
           {this.state.toggleSearch ?
             <div className="rows2">
-              <Button variant="secondary" onClick={this.handleSearchToggle}>Ingredients</Button>
-              <h3 > &nbsp; &nbsp;</h3>
-              <Button variant="primary"  >Cuisines </Button>
+              <Button variant="secondary" onClick={this.handleSearchToggle}> <FaSearch /> Ingredients</Button>
+              <div > &nbsp; &nbsp;</div>
+              <Button variant="primary"> <FaSearch /> Cuisines </Button>
             </div>
             :
             <div className="rows2">
-              <Button variant="primary" >Ingredients</Button>
-              <h3 > &nbsp; &nbsp;</h3>
-              <Button variant="secondary" onClick={this.handleSearchToggle}>Cuisines </Button>
+              <Button variant="primary"> <FaSearch /> Ingredients</Button>
+              <div > &nbsp; &nbsp;</div>
+              <Button variant="secondary" onClick={this.handleSearchToggle}> <FaSearch /> Cuisines </Button>
             </div>
           }
 
@@ -81,7 +83,7 @@ export default class SearchPage extends React.Component {
 
             // search by cuisines:
             <div className="rows">
-              <InputGroup.Text id="inputGroupPrepend">Cuisine</InputGroup.Text>
+              <InputGroup.Text id="inputGroupPrepend"> <TiHeartFullOutline/> </InputGroup.Text>
               <Select
                 isMulti
                 styles={selectStyles}
@@ -92,7 +94,8 @@ export default class SearchPage extends React.Component {
                 options={this.state.cuisineOptions}
                 onChange={this.handleCuisinesChange}
               />
-              <InputGroup.Text id="inputGroupPrepend">Location</InputGroup.Text>
+              <div > &nbsp; &nbsp;</div>
+              <InputGroup.Text id="inputGroupPrepend"> <TiLocation/> </InputGroup.Text>
               <Select
                 styles={selectStyles}
                 value={this.state.selectedLocation}
@@ -101,6 +104,7 @@ export default class SearchPage extends React.Component {
                 options={this.state.locationOptions}
                 onChange={this.handleLocationChange}
               />
+              <div > &nbsp; &nbsp;</div>
               <Button type="submit">Search</Button>
             </div>
 

@@ -10,6 +10,7 @@
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.0",
     "react-dom": "^16.13.1",
+    "react-icons": "^3.10.0",
     "react-multi-select-component": "^2.0.4",
     "react-native-elements": "^2.0.0",
     "react-native-paper": "^3.9.0",
