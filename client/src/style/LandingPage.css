@@ -1,0 +1,39 @@
+.bg {
+  background-image: url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg");
+  height: 100vh;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  font-family: 'Helvetica Neue';
+}
+
+.LandingPage-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: left;
+  padding-left: 50px;
+}
+
+.LandingPage-container .banner {
+  text-align: left;
+}
+
+h1 {
+  color: aliceblue;
+  font-weight: 700;
+  font-size: 4.5em;
+}
+
+.text{
+  color: aliceblue;
+  font-size: 1.2em;
+  font-family: 'Helvetica Neue';
+}
+
+.button{
+  padding-top: 20px;
+  color: aliceblue;
+  font-size: 1em;
+}
+
