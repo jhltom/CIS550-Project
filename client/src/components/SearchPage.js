@@ -32,7 +32,19 @@ export default class SearchPage extends React.Component {
         { value: 'NY', label: 'Greater New York City Area' },
       ],
       selectedCuisines: [],
-      selectedLocation: ""
+      selectedLocation: "",
+
+      ingredientOptions: [
+        { value: 'milk', label: 'milk'},
+        { value: 'flower', label: 'flower'},
+        { value: 'peach', label: 'peach'},
+        { value: 'loach', label: 'loach'},
+        { value: 'black bass', label: 'black bass'},
+        { value: 'curry', label: 'curry'},
+        { value: 'toufu', label: 'toufu'},
+      ],
+      selectedIngredients: []
+
     }
   }
 
@@ -52,7 +64,12 @@ export default class SearchPage extends React.Component {
     this.setState({ toggleSearch: !this.state.toggleSearch });
   }
 
-
+  handleIngredientsChange = (selectedIngredients) => {
+    this.setState(
+      { selectedIngredients },
+      () => console.log('ingredients selected:', this.state.selectedIngredients)
+    );
+  }
 
 
 
@@ -112,6 +129,29 @@ export default class SearchPage extends React.Component {
 
             // search by ingredients: by Zhongyang
             <div className="rows">
+              <InputGroup.Text id="inputGroupPrepend"> <TiHeartFullOutline/> </InputGroup.Text>
+              <Select
+                isMulti
+                styles={selectStyles}
+                value={this.state.selectedIngredients}
+                isSearchable
+                placeholder="Select ingredient(s) ... "
+                size={50}
+                options={this.state.ingredientOptions}
+                onChange={this.handleIngredientsChange}
+              />
+              <div > &nbsp; &nbsp;</div>
+              {/* <InputGroup.Text id="inputGroupPrepend"> <TiLocation/> </InputGroup.Text>
+              <Select
+                styles={selectStyles}
+                value={this.state.selectedLocation}
+                placeholder="Select location ... "
+                size={50}
+                options={this.state.locationOptions}
+                onChange={this.handleLocationChange}
+              /> */}
+              <div > &nbsp; &nbsp;</div>
+              <Button type="submit">Search</Button>
             </div>
           
           
