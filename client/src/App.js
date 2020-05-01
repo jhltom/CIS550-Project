@@ -9,6 +9,7 @@ import Feature1 from './components/Feature1';
 import Feature2 from './components/Feature2';
 import Feature3 from './components/Feature3';
 import SearchPage from './components/SearchPage';
+import LandingPage from './components/LandingPage';
 import './App.css';
 
 function App() {
@@ -16,11 +17,18 @@ function App() {
 		<div className="App">
 			<Router>
 				<Switch>
+				<Route
+						exact
+						path="/Main"
+						render={() => (
+							<LandingPage />
+						)}
+					/>
 					<Route
 						exact
 						path="/"
 						render={() => (
-							<Home />
+							<LandingPage />
 						)}
 					/>
 					<Route
