@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {
 	Redirect
 } from 'react-router-dom';
-import { withAuthenticator, AmplifySignOut,  } from '@aws-amplify/ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import { Spinner } from 'react-bootstrap';
 import { Hub } from 'aws-amplify'
 import '../style/LoginLoadingModal.css';

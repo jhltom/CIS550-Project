@@ -1,19 +1,22 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Navbar, Button, Modal, Nav } from 'react-bootstrap';
-import { FaHome, FaUserAlt } from 'react-icons/fa';
+import { Navbar, Button, Modal, Nav, Spinner } from 'react-bootstrap';
+import { FaHome, FaUserAlt, FaSignOutAlt } from 'react-icons/fa';
 import '../style/LandingPage.css';
 import {Redirect} from 'react-router-dom';
 import { Auth } from 'aws-amplify'
 import LoginLoadingModal from './LoginLoadingModal'
+import UserPage from './UserPage'
 
 export default class LandingPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       toSearch: false,
+      // modal toggles:
       showUser: false,
-      showLogin: false
+      showLogin: false,
+      showSignOut: false
     }
   }
 
@@ -67,8 +70,18 @@ export default class LandingPage extends React.Component {
           <Modal.Title>User</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Button variant="primary" onClick={this.handleLogOut} >Sign out! </Button>
+          <UserPage/>
         </Modal.Body>
+      </Modal>
+    )
+  }
+  signOutModal = () =>{
+    return (
+      <Modal show={this.state.showSignOut} onHide={this.handleCloseSignOutModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Signed out!</Modal.Title>
+        </Modal.Header>
+        {/* <Modal.Body>Redirecting to main page . . . <Spinner animation="border" /> </Modal.Body> */}
       </Modal>
     )
   }
@@ -78,10 +91,16 @@ export default class LandingPage extends React.Component {
   handleCloseUserModal = () =>{
     this.setState({ showUser: false });
   }
+  handleShowSignOutModal = () =>{
+    this.setState({ showSignOut: true });
+  }
+  handleCloseSignOutModal = () =>{
+    this.setState({ showSignOut: false });
+  }
   handleLogOut = async () =>{
     try {
       await Auth.signOut();
-      this.handleCloseUserModal();
+      this.handleShowSignOutModal();
     } catch (error) {
       console.log('error signing out: ', error);
     }
@@ -106,6 +125,9 @@ export default class LandingPage extends React.Component {
           <Navbar.Brand onClick={this.handleShowUserModal} >
             <FaUserAlt />
           </Navbar.Brand>
+          <Navbar.Brand onClick={this.handleLogOut} >
+            <FaSignOutAlt />
+          </Navbar.Brand>
         </Navbar>
 
         <div className="LandingPage-container">
@@ -121,6 +143,7 @@ export default class LandingPage extends React.Component {
 
         {/* modals */}
         {this.loginModal()}
+        {this.signOutModal()}
         {this.userModal()}
       </div>
     );
