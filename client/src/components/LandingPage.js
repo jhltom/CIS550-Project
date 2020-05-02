@@ -45,7 +45,7 @@ export default class LandingPage extends React.Component {
    */
   loginModal = () => {
     return (
-      <Modal show={this.state.showLogin} >
+      <Modal show={this.state.showLogin} onHide={this.handleCloseModal}>
         <LoginLoadingModal />
       </Modal>
     )
@@ -67,9 +67,7 @@ export default class LandingPage extends React.Component {
         <Modal.Header closeButton>
           <Modal.Title>User</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <UserPage/>
-        </Modal.Body>
+        <UserPage/>
       </Modal>
     )
   }

@@ -11,7 +11,7 @@ import {
   Modal,
 } from "react-bootstrap";
 import Select from 'react-select';
-import { Hub } from 'aws-amplify'
+import { Hub, API } from 'aws-amplify'
 import '../style/LoginLoadingModal.css';
 
 
@@ -20,6 +20,7 @@ class LoginLoadingModal extends React.Component {
     super(props);
     this.state = {
       newUser: false,
+      userId: "",
       cuisineOptions: [
         { value: 'American', label: 'American' },
         { value: 'Chinese', label: 'Chinese' },
@@ -43,6 +44,8 @@ class LoginLoadingModal extends React.Component {
       const { payload } = data;
       console.log('A new auth event has happened: ', data.payload.data.username + ' has ' + data.payload.event);
       console.log(payload);
+      this.setState({userId: data.payload.data.username});
+      console.log(this.state.userId)
       
       if (data.payload.event === "signIn") {
         console.log("Signed in!")
@@ -95,8 +98,21 @@ class LoginLoadingModal extends React.Component {
       this.state.selectedCuisines.length > 0
     )
   }
-  handleCreateNewUser = () => {
-    alert(`New user successfully created! ${this.state.lastName} ${this.state.firstName}`)
+  handleCreateNewUser = async () => {
+    
+    console.log('handle');
+    await API.post("cis550proj", "/users", {
+      body: {
+        id: this.state.userId,
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        favoriteCuisines: this.state.selectedCuisines
+      }
+    });
+    
+    // const response = await API.get("cis550proj", `/users/${this.state.userId}`);
+    // console.log("Result: ", response);
+    alert(`New user successfully created! ${this.state.lastName} ${this.state.firstName}`);
     setTimeout(this.navigateToSearch(), 3000);
   }
 
