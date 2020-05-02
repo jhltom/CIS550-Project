@@ -37,19 +37,13 @@ export default class SearchPage extends React.Component {
       selectedLocation: "",
 
       // ingredients states
-      ingredientsOptions: [
-        { value: 'milk', label: 'milk'},
-        { value: 'flower', label: 'flower'},
-        { value: 'peach', label: 'peach'},
-        { value: 'loach', label: 'loach'},
-        { value: 'black bass', label: 'black bass'},
-        { value: 'curry', label: 'curry'},
-        { value: 'toufu', label: 'toufu'},
-      ],
+      ingredientsOptions: [],
       search: null,
       selectedIngredients: [],
       selectedOptions: [],
-      matchedCuisines: []
+      matchedCuisines: [],
+      currSet: new Set(),
+      checked: false
     }
   }
 
@@ -84,6 +78,7 @@ export default class SearchPage extends React.Component {
     );
   }
   getSearchedIngredient = () => {
+    this.state.check = false;
     fetch("http://localhost:8081/searchedIngredient/" + this.state.search,{
       method: 'GET'
     }).then(res => {
@@ -98,8 +93,11 @@ export default class SearchPage extends React.Component {
           label: option
         })
       });
-      this.setState({ingredientsOptions: options});
+      this.setState(
+        {ingredientsOptions: options}
+      );
       console.log(options);
+      console.log('test uncheck', this.state.checked);
     }, err => {
       console.log(err);
     });
@@ -111,12 +109,25 @@ export default class SearchPage extends React.Component {
     );
   };
 
-  handleCheck = () => {
-    let update = this.state.selectedIngredients.concat(this.state.ingredientsOptions) ;
-    this.setState(
-      { selectedIngredients: update},
-      () => console.log(`All Option selected:`, this.state.selectedIngredients)
-    );
+  handleCheck =  (event) => {
+    console.log(event.target.checked);
+    if(event.target.checked){
+      let update = this.state.selectedIngredients.concat(this.state.ingredientsOptions) ;
+      console.log("before reset");
+      this.setState(
+        
+        {checked:true},
+        { selectedIngredients: update},
+        () => console.log(`All Option selected:`, this.state.selectedIngredients)
+      );
+    } 
+    else{
+      this.setState(
+        {checked: false},
+        () => console.log('uncheck it')
+      );
+    }
+    console.log(this.state.checked);
   };
 
   getCuisines = () => {
@@ -186,7 +197,10 @@ export default class SearchPage extends React.Component {
               <div > &nbsp; &nbsp;</div>
               <Button variant="secondary" onClick={this.handleSearchToggle}> <FaSearch /> Cuisines </Button>
             </div>
+
           }
+
+     
 
           {this.state.toggleSearch ?
 
@@ -234,7 +248,7 @@ export default class SearchPage extends React.Component {
 
               <div > &nbsp; &nbsp;</div>
 
-              <InputGroup.Text id="inputGroupPrepend"> <TiHeartFullOutline/> </InputGroup.Text>
+              
               <Select
                 isMulti
                 styles={selectStyles}
@@ -245,27 +259,53 @@ export default class SearchPage extends React.Component {
                 options={this.state.ingredientsOptions}
                 onChange={this.handleSelectedChange}
               />
-              <Button type="submit" onClick = {this.getCuisines}>See Cuisines</Button>
-
               <div class="Checkbox">
-                <Checkbox type="checkbox" onClick={this.handleCheck}/>               
+                <Checkbox
+                  type="checkbox" 
+                  checked={this.state.checked}
+                  onClick={this.handleCheck}
+                />               
                 <label>Select All Types</label>
               </div>
+              <Button type="submit" onClick = {this.getCuisines}>See Cuisines</Button>
 
-              <div className="header-container">
-                <div className="headers">
-                  <div className="header"><strong>Cuisine Type</strong></div>
-                  <div className="header"><strong>Matching Scores</strong></div>
-                </div>
-              </div>
 
-              <div className="results-container" id="results">
-                {this.state.matchedCuisines}
-              </div>
+              
               
             </div>
             
           }
+
+          
+          {this.state.toggleSearch ?
+
+            // search by cuisines:
+            <div className="rows">
+
+            </div>
+
+            :
+
+            // search by ingredients: by Zhongyang
+            <div className="rows">                   
+
+            <div className="header-container">
+              <div className="headers">
+                <div className="header"><strong>Cuisine Type</strong></div>
+                <div className="header"><strong>Matching Scores</strong></div>
+              </div>
+            </div>
+
+            <div className="results-container" id="results">
+              {this.state.matchedCuisines}
+            </div>
+  
+              
+            </div>
+
+          }
+
+
         
         
 
