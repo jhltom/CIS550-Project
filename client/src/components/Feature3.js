@@ -2,9 +2,11 @@ import React from 'react';
 import '../style/Feature3.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
-import Modal from "react-bootstrap/Modal";
+import Modal from 'react-bootstrap/Modal';
 import Select from 'react-select';
 import PageNavbar from './PageNavbar';
+import Map from './Map';
+import RestaurantCard from './RestaurantCard';
 
 export default class Feature3 extends React.Component {
 
@@ -28,7 +30,7 @@ export default class Feature3 extends React.Component {
         { value: 5, label: '5' },
       ],
       show: false,
-      results: ""
+      restaurants: []
     }
   }
 
@@ -38,15 +40,18 @@ export default class Feature3 extends React.Component {
     const latitude = position.coords.latitude;
     const longitude = position.coords.longitude;
 
-    this.setState({ lat: latitude, lng: longitude });
+    this.setState({ lat: latitude, lng: longitude, loading: false });
     
-    const gMapScript = document.createElement("script");
-    gMapScript.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDOrXq_0ahcTlnhzfjrS7ruzV6Hk_v63So";
+    // const gMapScript = document.createElement("script");
+    // gMapScript.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDOrXq_0ahcTlnhzfjrS7ruzV6Hk_v63So";
 
-    window.document.body.appendChild(gMapScript);
-    gMapScript.addEventListener("load", () => {
-      this.googleMap = this.initMap();
-    });
+    // window.document.body.appendChild(gMapScript);
+    // gMapScript.addEventListener("load", () => {
+    //   this.googleMap = this.initMap();
+    // });
+
+    // document.getElementById("loader").style.display = "none";
+    // document.getElementById("gmap").style.display = "block";
   }
 
   error = () => {
@@ -54,8 +59,8 @@ export default class Feature3 extends React.Component {
   }
 
   componentDidMount = async () => {
-    document.getElementById("gmap").style.display = "none";
-    document.getElementById("loader").style.display = "block";
+    // document.getElementById("gmap").style.display = "none";
+    // document.getElementById("loader").style.display = "block";
 
     await this.fetchCuisines();
 
@@ -67,22 +72,24 @@ export default class Feature3 extends React.Component {
   }
 
   fetchCuisines = async () => {
-    const response = await fetch("http://localhost:8081/cuisineTypesFull",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
-    );
-    const body = await response.json();
+    // const response = await fetch("http://localhost:8081/cuisineTypesFull",
+    //   {
+    //     method: "GET",
+    //     headers: {
+    //       "Content-Type": "application/json"
+    //     }
+    //   }
+    // );
+    // const body = await response.json();
 
-    const data = body.rows.map(row => {
-      return {
-        value: row[0],
-        label: row[1]
-      }
-    });
+    // const data = body.rows.map(row => {
+    //   return {
+    //     value: row[0],
+    //     label: row[1]
+    //   }
+    // });
+
+    const data = [{ value: 9, label: "Korean"}];
 
     this.setState({ allCuisines: data });
     return;
@@ -151,7 +158,7 @@ export default class Feature3 extends React.Component {
       }
     );
     const body = await response.json();
-    this.setState({ loading: false, results: body.rows });
+    this.setState({ loading: false, restaurants: body.rows });
     this.handleShow();
   }
 
@@ -159,53 +166,63 @@ export default class Feature3 extends React.Component {
     return (
       <div className="Feature3">
         <PageNavbar active="Feature3" />
+        { this.state.loading &&
         <div id="loader">
           <div className="spinner"></div>
         </div>
-
-        <div className="container">
-          <div className="row selectContainer">
-            <div className="col-4 selectItem">
-              <Select
-                value={this.state.selectedCuisines}
-                options={this.state.allCuisines}
-                onChange={this.handleCuisineSelect}
-                isMulti
-                isSearchable
-                placeholder="Select Cuisine(s) ... "
-              />
-            </div>
-
-            <div className="col-4 selectItem">
-              <Select
-                value={this.state.radius}
-                options={this.state.radii}
-                onChange={this.handleRadiusSelect}
-                placeholder="Select Radius ... "
-              />
-            </div>
-
-            <div className="col-2">
-              <Button
-                variant="primary"
-                disabled={this.state.loading}
-                onClick={this.handleClick}
-              >Search</Button>
-            </div>
-
+        }
+        <div className="selectSection">
+          <div className="selectItem">
+            <Select
+              value={this.state.selectedCuisines}
+              options={this.state.allCuisines}
+              onChange={this.handleCuisineSelect}
+              isMulti
+              isSearchable
+              placeholder="Select Cuisine(s) ... "
+            />
           </div>
+
+          <div className="selectItem">
+            <Select
+              value={this.state.radius}
+              options={this.state.radii}
+              onChange={this.handleRadiusSelect}
+              placeholder="Select Radius ... "
+            />
+          </div>
+
+          <Button
+            variant="primary"
+            disabled={this.state.loading}
+            onClick={this.handleClick}
+          >Search</Button>
+
         </div>
 
-        <div id="gmap" ref={this.googleMap}>
+        <div className="displaySection">
+          <div className="restaurantContainer">
+          {this.state.restaurants.length === 0 &&
+            <div className="noResults">No results to show</div>
+          }
+          {this.state.restaurants.map((restaurant) => (
+            <RestaurantCard restaurant={restaurant} />
+          ))}
+          </div>
+          <div id="gmap" ref={this.googleMap}>
+          { !this.state.loading &&
+            <Map lat={this.state.lat} lng={this.state.lng}/>
+          }
+          </div>
         </div>
 
         <Modal show={this.state.show} onHide={this.handleClose}>
           <Modal.Header closeButton>
-            <Modal.Title>Results</Modal.Title>
+            <Modal.Title>Restaurants</Modal.Title>
           </Modal.Header>
           <Modal.Body>This is a work in progress:
             <br></br>
-            {this.state.results}
+            {this.state.restaurants}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={this.handleClose}>

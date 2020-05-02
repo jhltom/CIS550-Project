@@ -5,22 +5,52 @@ html, body, #gmap {
 	margin: 0;
 }
 
-.selectContainer {
+.selectSection {
+	height: 20vh;
 	display: flex;
 	justify-content: center;
+	align-items: center;
+	background: #e3e3e3;
+}
+
+.displaySection {
+	display: flex;
+	box-shadow: 5px 5px 8px #888;
+}
+
+.restaurantContainer {
+	height: 80vh;
+	width: 40vw;
+	position: relative;
+}
+
+.noResults {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: #d3d3d3;
+	font-weight: 800;
+	font-size: 2em;
 }
 
 .selectItem {
 	padding: 0, 1em,0, 1em;
+	margin-right: 1em;
+	width: 20vw;
 }
 
 #gmap {
-	height: 100vh;
-	width: 100vw;
+	height: 80vh;
+	width: 60vw;
+	position: relative;
 }
 
 #loader {
-	display: none;
 	position: fixed;
 	z-index: 999;
 	background-color: rgba(0, 0, 0, 0.5);
