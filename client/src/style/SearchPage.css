@@ -1,3 +1,7 @@
+.overall-container{
+  background-color: #282c34;
+}
+
 .SearchPage-container {
   display: flex;
   flex-direction: column;
@@ -8,7 +12,7 @@
   min-height: 100vh;  
   align-items: center;
   justify-content: center;
-  background-color: #282c34;
+  
 }
 .SearchPage-container .searchBar-container {
   /* flex: 1; */
