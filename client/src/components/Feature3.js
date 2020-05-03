@@ -94,36 +94,6 @@ export default class Feature3 extends React.Component {
     return;
   }
 
-  initMap = () => {
-    let stylesArray = [{"featureType":"water","stylers":[{"color":"#46bcec"},{"visibility":"on"}]},{"featureType":"landscape","stylers":[{"color":"#f2f2f2"}]},{"featureType":"road","stylers":[{"saturation":-100},{"lightness":45}]},{"featureType":"road.highway","stylers":[{"visibility":"simplified"}]},{"featureType":"road.arterial","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"color":"#444444"}]},{"featureType":"transit","stylers":[{"visibility":"off"}]},{"featureType":"poi","stylers":[{"visibility":"off"}]}];
-    let mapType = window.google.maps.MapTypeId.ROADMAP;
-    let map = new window.google.maps.Map(this.googleMap.current, {
-      zoom: 15,
-      center: {
-        lat: this.state.lat,
-        lng: this.state.lng
-      },
-      disableDefaultUI: true,
-      mapTypeId: mapType,
-      styles: stylesArray
-    });
-
-    let origin = new window.google.maps.Marker({
-      position: {
-        lat: this.state.lat,
-        lng: this.state.lng
-      },
-      map: map
-    })
-
-    this.setState({ map: map, origin: origin });
-
-    document.getElementById("loader").style.display = "none";
-    document.getElementById("gmap").style.display = "block";
-
-    this.setState({ loading: false });
-  }
-
   handleCuisineSelect = async selectedCuisine => {
     this.setState({ selectedCuisines: selectedCuisine });
   }
