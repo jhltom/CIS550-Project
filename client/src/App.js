@@ -55,16 +55,12 @@ function App() {
 					<Route
 						exact
 						path="/Feature3"
-						render={() => (
-							<Feature3 />
-						)}
+						component={Feature3} 
 					/>
 					<Route
 						exact
 						path="/Search"
-						render={() => (
-							<SearchPage />
-						)}
+						component={SearchPage}
 					/>
 					/>
 				</Switch>

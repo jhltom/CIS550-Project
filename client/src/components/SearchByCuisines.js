@@ -2,8 +2,8 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button, InputGroup } from 'react-bootstrap';
 import Select from 'react-select';
+import { Link } from "react-router-dom";
 import '../style/SearchPage.css';
-
 import { TiHeartFullOutline, TiLocation } from "react-icons/ti";
 
 export default class SearchByCuisines extends React.Component {
@@ -26,29 +26,34 @@ export default class SearchByCuisines extends React.Component {
         { value: 'NY', label: 'Greater New York City Area' },
       ],
       selectedCuisines: [],
-      selectedLocation: "",
+      _selectedCuisines: [],
+      selectedLocation: null,
+      _selectedLocation: "",
 
     }
   }
 
   handleCuisinesChange = (selectedCuisines) => {
-    this.setState(
-      { selectedCuisines },
-      () => console.log(`Option selected:`, this.state.selectedCuisines)
-    );
+    let _selectedCuisines = [];
+    selectedCuisines.map((element) =>{
+      _selectedCuisines.push(element.value);
+    })
+    this.setState({selectedCuisines, _selectedCuisines});
   }
   handleLocationChange = (selectedLocation) => {
-    this.setState(
-      { selectedLocation },
-      () => console.log(`Option selected:`, this.state.selectedLocation)
-    );
+    this.setState({selectedLocation, _selectedLocation: selectedLocation.value});
   }
   handleSearchToggle = () => {
     this.setState({ toggleSearch: !this.state.toggleSearch });
   }
+  validateSearch = () => {
+    return (
+      this.state._selectedLocation.length > 0 &&
+      this.state.selectedCuisines.length > 0
+    )
+  }
 
   render() {
-
     return (
       <div className="rows">
         <InputGroup.Text id="inputGroupPrepend"> <TiHeartFullOutline /> </InputGroup.Text>
@@ -73,7 +78,15 @@ export default class SearchByCuisines extends React.Component {
           onChange={this.handleLocationChange}
         />
         <div > &nbsp; &nbsp;</div>
-        <Button type="submit">Search</Button>
+        <Link
+          to={{
+            pathname: `/Feature3`,
+            state: {// place data you want to send here!
+              selectedLocation: this.state._selectedLocation,
+              selectedCuisines: this.state._selectedCuisines
+            } 
+          }}><Button type="submit" disabled={!this.validateSearch()} > Submit </Button> 
+        </Link>
       </div>
     );
   }

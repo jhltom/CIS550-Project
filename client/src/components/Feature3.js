@@ -62,12 +62,24 @@ export default class Feature3 extends React.Component {
     // document.getElementById("gmap").style.display = "none";
     // document.getElementById("loader").style.display = "block";
 
+    this.fetchRestaurantsFromSearchByCuisines(); //Tom: handle data from SearchByCuisines component
+
     await this.fetchCuisines();
 
     if (!navigator.geolocation) {
       console.log("Geolocation isn't supported on your browser.");
     } else {
       navigator.geolocation.getCurrentPosition(this.success, this.error);
+    }
+  }
+
+  // Tom: data passed from SearchByCuisines component will be stored in "this.props.location.state"
+  fetchRestaurantsFromSearchByCuisines = () =>{
+    if (this.props.location){
+      const { selectedLocation, selectedCuisines } = this.props.location.state;
+      console.log("data received 1: ", selectedLocation);
+      console.log("data received 2: ", selectedCuisines);
+      // TODO: fetch restaurants based on "selectedLocation" and "selectedCuisines"
     }
   }
 
