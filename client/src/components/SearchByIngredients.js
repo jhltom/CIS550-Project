@@ -16,7 +16,7 @@ export default class SearchByIngredients extends React.Component {
       selectedOptions: [],
       matchedCuisines: [],
       checked: false,
-      value: [],
+      //value: [],
       displayOptions: [
         { value: 1, label: '1' },
         { value: 2, label: '2' },
@@ -163,13 +163,6 @@ export default class SearchByIngredients extends React.Component {
       }).then(async result => {
         console.log('matched cuisines', result.rows);
         let matchedCuisines = result.rows.map((cuisine, i) => {
-          // for(let h = 0; h < this.state.freq.length; h++){
-          //   console.log('enter loop');
-          //   if(cuisine[0] == this.state.freq[h].cuisine){
-          //     cuisine[1] = ((cuisine[1] / this.state.freq[h].freq) * 100).toFixed(2);
-          //     console.log('weighted:', cuisine[1]);
-          //   }
-          // }
           return (
             <div key={i} className="cuisine">
               <div className="cuisineName">{cuisine[0]}</div>
@@ -200,17 +193,17 @@ export default class SearchByIngredients extends React.Component {
     );
   };
 
-  onChange(e, i){
-    let value = this.state.value.slice();
-    value[i] = e.target.checked;
-    this.setState({value})
- }
+//   onChange(e, i){
+//     let value = this.state.value.slice();
+//     value[i] = e.target.checked;
+//     this.setState({value})
+//  }
      
- unCheck(i){
-    let value = this.state.value.slice();
-    value[i] = !value[i];
-    this.setState({value})
- }
+//  unCheck(i){
+//     let value = this.state.value.slice();
+//     value[i] = !value[i];
+//     this.setState({value})
+//  }
 
   render() {
 
@@ -275,7 +268,7 @@ export default class SearchByIngredients extends React.Component {
           </div>
 
 
-        <div>
+        {/* <div>
            {[1,2,3,4,5].map((item,i) => {
              return (
                 <div>
@@ -284,7 +277,7 @@ export default class SearchByIngredients extends React.Component {
                 </div>
               )
            })}      
-      </div>
+      </div> */}
 
       </div>
 
