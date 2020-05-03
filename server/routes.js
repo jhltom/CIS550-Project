@@ -7,8 +7,6 @@ let pool;
 
 // Async function to initialize connection pool
 async function initPool() {
-	console.log(oracle)
-	console.log(config)
 	try {
 		pool = await oracle.createPool(config);
 		console.log("Connection pool created.");
@@ -26,10 +24,27 @@ async function getPool() {
 	return pool;
 }
 
-// Helper function to format JSON
-function formatResult(result) {
-	let data = JSON.parse(result);
-	return data;
+// Helper functions to format JSON
+function objectify(keys, values) {
+	let obj = {};
+	values.forEach(function(value, idx) {
+		obj[keys[idx]] = value;
+	});
+	return obj;
+}
+
+function formatResult(data) {
+	let formatted = {};
+	let colnames = data.metaData.map(function(item) {
+		return item.name;
+	});
+
+	let rows = data.rows.map(function(row) {
+		return objectify(colnames, row);
+	});
+	
+	formatted.data = rows;
+	return formatted;
 }
 
 // Template function
@@ -392,9 +407,8 @@ async function getAllCuisineTypesFull(req, res) {
 		let pool = await getPool();
 		connection = await pool.getConnection();
 		let result = await connection.execute(query);
-		// console.log("Result: ", result);
+		result = formatResult(result);
 		res.json(result);
-		console.log(typeof(result));
 	} catch (e) {
 		console.log(e);
 	} finally {
@@ -573,7 +587,7 @@ async function getNearbyRestaurants(req, res) {
 		let result = await connection.execute(query);
 
 		// Send response
-		console.log("Result: ", result);
+		result = formatResult(result);
 		res.json(result);
 
 	} catch (e) {
