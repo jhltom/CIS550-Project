@@ -25,7 +25,20 @@ export default class SearchByIngredients extends React.Component {
         { value: 5, label: '5' },
       ],
       selectedDisplay: 0,
-      freq: []
+      freq: [],
+
+
+      citiesOptions: [],
+      stateOptions: [
+        { value: 'CA', label: 'CA' },
+        { value: 'CT', label: 'CT' },
+        { value: 'DE', label: 'DE' },
+        { value: 'HI', label: 'HI' },
+        { value: 'NJ', label: 'NJ' },
+        { value: 'NY', label: 'NY' },
+        { value: 'PA', label: 'PA' },
+      ],
+      
     }
   }
 
