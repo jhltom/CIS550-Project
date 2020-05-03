@@ -168,8 +168,9 @@ export default class SearchByCuisines extends React.Component {
             to={{
               pathname: `/Feature3`,
               state: {// place data you want to send here!
-                selectedLocation: this.state._selectedLocation,
-                selectedCuisines: this.state._selectedCuisines
+                selectedCities: this.state._selectedCities,
+                selectedState: this.state._selectedState,
+                selectedCuisines: this.state._selectedCuisines,
               }
             }}><Button type="submit" disabled={!this.validateSearch()} > Search </Button>
           </Link>

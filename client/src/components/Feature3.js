@@ -76,9 +76,10 @@ export default class Feature3 extends React.Component {
   // Tom: data passed from SearchByCuisines component will be stored in "this.props.location.state"
   fetchRestaurantsFromSearchByCuisines = () =>{
     if (this.props.location){
-      const { selectedLocation, selectedCuisines } = this.props.location.state;
-      console.log("data received 1: ", selectedLocation);
-      console.log("data received 2: ", selectedCuisines);
+      const { selectedCities, selectedState, selectedCuisines } = this.props.location.state;
+      console.log("data received 1: ", selectedCuisines);
+      console.log("data received 2: ", selectedState);
+      console.log("data received 2: ", selectedCities);
       // TODO: fetch restaurants based on "selectedLocation" and "selectedCuisines"
     }
   }
