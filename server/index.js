@@ -42,6 +42,9 @@ app.post('/restaurantsNearby', routes.getNearbyRestaurants);
 /* ---- (cuisines strictly not using selected ingredients) ---- */
 app.post('/getCuisinesWithout', routes.getCuisinesMinusIngredients);
 
+/* ---- (cities from given state) ---- */
+app.get('/cities/:state', routes.getCitiesFromState);
+
 // Test endpoint
 app.get('/test', routes.test);
 
