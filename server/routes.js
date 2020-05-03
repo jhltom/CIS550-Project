@@ -26,6 +26,12 @@ async function getPool() {
 	return pool;
 }
 
+// Helper function to format JSON
+function formatResult(result) {
+	let data = JSON.parse(result);
+	return data;
+}
+
 // Template function
 async function test(req, res) {
 	// Define query here
@@ -329,6 +335,32 @@ async function getAllCuisineTypes(req, res) {
 	}
 }
 
+/* ---- (cuisine types) ---- */
+async function getAllCuisineTypesFull(req, res) {
+
+	const query = `SELECT * FROM CuisineType`;
+	let connection;
+
+	try {
+		let pool = await getPool();
+		connection = await pool.getConnection();
+		let result = await connection.execute(query);
+		// console.log("Result: ", result);
+		res.json(result);
+		console.log(typeof(result));
+	} catch (e) {
+		console.log(e);
+	} finally {
+		if (connection) {
+			try {
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+}
+
 /* ---- (restaurants with given cuisine) ---- */
 async function getRestaurantsWithCuisine(req, res) {
 	const cuisineType = req.params.cuisineType;
@@ -603,10 +635,11 @@ module.exports = {
 	cleanup: cleanup,
 	getAllIngredients: getAllIngredients,
 	getSearchedIngredient: getSearchedIngredient,
-  getAllCuisines: getAllCuisines,
+	getAllCuisines: getAllCuisines,
 	getMatchedCuisine: getMatchedCuisine,
 	getFreq: getFreq,
 	getAllCuisineTypes: getAllCuisineTypes,
+	getAllCuisineTypesFull: getAllCuisineTypesFull,
 	getRestaurantsWithCuisine: getRestaurantsWithCuisine,
 	getRelatedCuisines: getRelatedCuisines,
 	getNearbyRestaurants: getNearbyRestaurants,
