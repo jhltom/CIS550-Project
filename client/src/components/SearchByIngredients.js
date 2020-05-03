@@ -15,7 +15,7 @@ export default class SearchByIngredients extends React.Component {
       selectedIngredients: [],
       selectedOptions: [],
       matchedCuisines: [],
-      checked: [],
+      checked: false,
       value: [],
       displayOptions: [
         { value: 1, label: '1' },
@@ -24,8 +24,60 @@ export default class SearchByIngredients extends React.Component {
         { value: 4, label: '4' },
         { value: 5, label: '5' },
       ],
-      selectedDisplay: 0
+      selectedDisplay: 0,
+      freq: []
     }
+  }
+
+  componentDidMount = () => {
+
+    this.getFreq();
+
+  }
+
+  getFreq = () => {
+    fetch("http://localhost:8081/freq",{
+      method: 'GET'
+    }).then(res => {
+      return res.json();
+    }, err => {
+      console.log(err);
+    }).then(result => {
+      let freq = result.rows.map((row, i) => {
+        const cuisine = row[0].trim();
+        const freq = row[1];
+        return ({
+          cuisine: cuisine,
+          freq: freq
+        })
+      });
+      this.setState({freq});
+      console.log(freq);
+    }, err => {
+      console.log(err);
+    });
+  }
+
+  getAllIngredients = () => {
+    fetch("http://localhost:8081/ingredients/",{
+      method: 'GET'
+    }).then(res => {
+      return res.json();
+    }, err => {
+      console.log(err);
+    }).then(result => {
+      let ingredientsOptions = result.rows.map((row, i) => {
+        const ingredient = row[0].trim();
+        return ({
+          value: ingredient,
+          label: ingredient
+        })
+      });
+      this.setState({ingredientsOptions});
+      console.log(ingredientsOptions);
+    }, err => {
+      console.log(err);
+    });
   }
 
   handleIngredientsChange = (selectedIngredients) => {
@@ -41,7 +93,6 @@ export default class SearchByIngredients extends React.Component {
     );
   }
   getSearchedIngredient = () => {
-    this.state.check = false;
     fetch("http://localhost:8081/searchedIngredient/" + this.state.search, {
       method: 'GET'
     }).then(res => {
@@ -112,10 +163,17 @@ export default class SearchByIngredients extends React.Component {
       }).then(async result => {
         console.log('matched cuisines', result.rows);
         let matchedCuisines = result.rows.map((cuisine, i) => {
+          for(let h = 0; h < this.state.freq.length; h++){
+            console.log('enter loop');
+            if(cuisine[0] == this.state.freq[h].cuisine){
+              cuisine[1] = ((cuisine[1] / this.state.freq[h].freq) * 100).toFixed(2);
+              console.log('weighted:', cuisine[1]);
+            }
+          }
           return (
             <div key={i} className="cuisine">
               <div className="cuisineName">{cuisine[0]}</div>
-              <div className="matchingScore">{cuisine[1]}</div>
+              <div className="matchingScore">{cuisine[1]}%</div>
             </div>
           )
         });
@@ -133,7 +191,6 @@ export default class SearchByIngredients extends React.Component {
       ];
       this.setState({ matchedCuisines: matchedCuisines });
     }
-    console.log('display matchedCuisines:', this.state.matchedCuisines);
   }
 
   handleDisplayChange = selectedDisplay => {

@@ -21,8 +21,10 @@ app.get('/searchedIngredient/:search', routes.getSearchedIngredient);
 app.get('/cuisines', routes.getAllCuisines);
 
 /* ---- (matched cuisine) ---- */
-// app.post('/cuisines/:ingredients', routes.getMatchedCuisine);
 app.post('/matchedCuisines', routes.getMatchedCuisine);
+
+/* ---- (freq) ---- */
+app.get('/freq', routes.getFreq);
 
 /* ---- (cuisine types) ---- */
 app.get('/cuisineTypes', routes.getAllCuisineTypes);

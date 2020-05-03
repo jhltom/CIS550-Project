@@ -105,12 +105,13 @@ async function getAllIngredients(req, res) {
 async function getSearchedIngredient(req, res) {
 	let search = req.params.search;
 	// Define query here
-	const query = `
-		SELECT DISTINCT ingredient 
-		FROM ingredients
-		WHERE ingredient LIKE '%${search} %' OR ingredient LIKE '% ${search}%' 
-		OR ingredient LIKE '%${search}s%' OR ingredient LIKE '%${search}es%' OR ingredient = '${search}'
-	`;
+	let query;
+	query = `
+			SELECT DISTINCT ingredient 
+			FROM ingredients
+			WHERE ingredient LIKE '%${search} %' OR ingredient LIKE '% ${search}%' 
+			OR ingredient LIKE '%${search}s%' OR ingredient LIKE '%${search}es%' OR ingredient = '${search}'
+		`;
 
 	// Keep connection in wider scope
 	let connection;
@@ -246,6 +247,48 @@ async function getMatchedCuisine(req, res) {
 		console.log("Result: ", result);
 		res.json(result);
 		
+	} catch (e) {
+		console.log(e);
+
+	} finally {
+		if (connection) {
+			try {
+				// Close connection and return it to the pool
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+}
+
+/* ---- (ingredients) ---- */
+async function getFreq(req, res) {
+	// Define query here
+	const query = `
+		SELECT Distinct d.cuisine, COUNT(*) AS freq
+		FROM Dishes d
+		GROUP BY d.cuisine
+		ORDER BY freq DESC
+	`;
+
+	// Keep connection in wider scope
+	let connection;
+
+	try {
+		// Get connection pool
+		let pool = await getPool();
+
+		// Obtain single connection from pool
+		connection = await pool.getConnection();
+
+		// Query the db
+		let result = await connection.execute(query);
+
+		// Send response
+		console.log("Result: ", result);
+		res.json(result);
+
 	} catch (e) {
 		console.log(e);
 
@@ -537,6 +580,7 @@ module.exports = {
 	getSearchedIngredient: getSearchedIngredient,
     getAllCuisines: getAllCuisines,
 	getMatchedCuisine: getMatchedCuisine,
+	getFreq: getFreq,
 	getAllCuisineTypes: getAllCuisineTypes,
 	getRestaurantsWithCuisine: getRestaurantsWithCuisine,
 	getRelatedCuisines: getRelatedCuisines,
