@@ -29,13 +29,18 @@
   width: 100%;
   padding:5em;
 }
+.rows {
+  display: flex;
+  margin: 1%
+}
 .rows2 {
   display: flex;
   justify-content: center;
 }
-.rows {
+.rows3 {
   display: flex;
-  margin: 1%
+  margin: 1%;
+  width: 89.7%
 }
 
 
