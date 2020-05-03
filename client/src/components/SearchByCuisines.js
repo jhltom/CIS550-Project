@@ -20,12 +20,7 @@ export default class SearchByCuisines extends React.Component {
         { value: 'Mexican', label: 'Mexican' },
         { value: 'Spanish', label: 'Spanish' },
       ],
-      citiesOptions: [
-        { value: 'PHL', label: 'Greater Phialdelphia Area' },
-        { value: 'LA', label: 'Greater Los Angeles Area' },
-        { value: 'SF', label: 'San Francisco Bay Area' },
-        { value: 'NY', label: 'Greater New York City Area' },
-      ],
+      citiesOptions: [],
       stateOptions: [
         { value: 'CA', label: 'CA' },
         { value: 'CT', label: 'CT' },
@@ -145,7 +140,7 @@ export default class SearchByCuisines extends React.Component {
       selectedState: [{ value: 'Current Location', label: 'Current Location' }],
       _selectedState: 'Current Location',
       selectedCities: [{ value: 'Current Location', label: 'Current Location' }],
-      _selectedCities: 'Current Location',
+      _selectedCities: ['Current Location'],
     })
   }
   handleLosAngeles = () => {
@@ -172,7 +167,9 @@ export default class SearchByCuisines extends React.Component {
         { value: 'Santa Clarita', label: 'Santa Clarita' },
         { value: 'Torrance', label: 'Torrance' },
       ],
-      _selectedCities: 'Los Angeles',
+      _selectedCities: ['Los Angeles', "Anaheim","Garnden Grove","Glendale",
+      "Huntington Beach","Irvine", 'Long Beach' ,'Moreno Valley','Ontario','Oxnard', 'Pasadena', 'Rancho Cucamonga','Riverside',
+    'San Bernardino', 'Santa Ana', 'Santa Clarita', 'Torrance'  ],
     })
   }
   handleNewYorkCity = () => {
@@ -180,7 +177,7 @@ export default class SearchByCuisines extends React.Component {
       selectedState: [{ value: 'NY', label: 'NY' }],
       _selectedState: 'NY',
       selectedCities: [{ value: 'New York', label: 'New York' }, { value: 'New York City', label: 'New York City' }],
-      _selectedCities: 'New York',
+      _selectedCities: ['New York','New York City'],
     })
   }
   handlePhiladelphia = () => {
@@ -195,7 +192,7 @@ export default class SearchByCuisines extends React.Component {
         { value: 'Delaware', label: 'Delaware' },
         { value: 'Montgomery', label: 'Montgomery' },
       ],
-      _selectedCities: 'Philadelphia',
+      _selectedCities: ['Philadelphia','Bucks','Chester','Delaware','Montgomery'],
     })
   }
   handleSanFrancisco = () => {
@@ -203,7 +200,7 @@ export default class SearchByCuisines extends React.Component {
       selectedState: [{ value: 'CA', label: 'CA' }],
       _selectedState: 'CA',
       selectedCities: [{ value: 'San Francisco', label: 'San Francisco' }],
-      _selectedCities: 'San Francisco',
+      _selectedCities: ['San Francisco'],
     })
   }
 

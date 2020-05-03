@@ -79,7 +79,7 @@ export default class Feature3 extends React.Component {
       const { selectedCities, selectedState, selectedCuisines } = this.props.location.state;
       console.log("data received 1: ", selectedCuisines);
       console.log("data received 2: ", selectedState);
-      console.log("data received 2: ", selectedCities);
+      console.log("data received 3: ", selectedCities);
       // TODO: fetch restaurants based on "selectedLocation" and "selectedCuisines"
     }
   }
