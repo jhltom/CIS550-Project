@@ -16,7 +16,8 @@ export default class SearchByIngredients extends React.Component {
       selectedOptions: [],
       matchedCuisines: [],
       currSet: new Set(),
-      checked: false
+      checked: [],
+      value: []
     }
   }
 
@@ -49,8 +50,10 @@ export default class SearchByIngredients extends React.Component {
         })
       });
       this.setState(
-        { ingredientsOptions: options }
+        { ingredientsOptions: options },
       );
+      let checked = false;
+      this.setState({checked});
       console.log(options);
       console.log('test uncheck', this.state.checked);
     }, err => {
@@ -65,24 +68,16 @@ export default class SearchByIngredients extends React.Component {
   };
 
   handleCheck = (event) => {
-    console.log(event.target.checked);
-    if (event.target.checked) {
+    let checked = event.target.checked;
+    this.setState({checked});
+    if(checked){
       let update = this.state.selectedIngredients.concat(this.state.ingredientsOptions);
-      console.log("before reset");
       this.setState(
-
-        { checked: true },
         { selectedIngredients: update },
         () => console.log(`All Option selected:`, this.state.selectedIngredients)
-      );
+      )
     }
-    else {
-      this.setState(
-        { checked: false },
-        () => console.log('uncheck it')
-      );
-    }
-    console.log(this.state.checked);
+
   };
 
   getCuisines = () => {
@@ -131,6 +126,17 @@ export default class SearchByIngredients extends React.Component {
     console.log('display matchedCuisines:', this.state.matchedCuisines);
   }
 
+  onChange(e, i){
+    let value = this.state.value.slice();
+    value[i] = e.target.checked;
+    this.setState({value})
+ }
+     
+ unCheck(i){
+    let value = this.state.value.slice();
+    value[i] = !value[i];
+    this.setState({value})
+ }
 
   render() {
 
@@ -171,7 +177,11 @@ export default class SearchByIngredients extends React.Component {
         </div>
         <div className="rows">
 
-          <div className="header-container">
+          
+        </div>
+
+
+        <div className="header-container">
             <div className="headers">
               <div className="header"><strong>Cuisine Type</strong></div>
               <div className="header"><strong>Matching Scores</strong></div>
@@ -181,8 +191,25 @@ export default class SearchByIngredients extends React.Component {
           <div className="results-container" id="results">
             {this.state.matchedCuisines}
           </div>
-        </div>
+
+
+        <div>
+           {[1,2,3,4,5].map((item,i) => {
+             return (
+                <div>
+                  <input checked={this.state.value[i]} type="checkbox" onChange={(e) => this.onChange(e, i)}/>
+                  <button onClick={()=>this.unCheck(i)}>Toggle</button>
+                </div>
+              )
+           })}      
       </div>
+
+      </div>
+
+
+
+
+      
     )
   }
 }
