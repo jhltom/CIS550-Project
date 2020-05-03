@@ -187,10 +187,11 @@ async function getMatchedCuisine(req, res) {
 	console.log(req.body.data);
 	console.log('after print');
 	const selectedIngredients = req.body.data.selection;
+	const display = req.body.data.display;
 	let subquery = ``;
 	for(i = 0; i < selectedIngredients.length; i++){
 		if(i > 0){
-			subquery += 'AND';
+			subquery += 'OR';
 		}
 		subquery += `
 			EXISTS(
@@ -207,19 +208,22 @@ async function getMatchedCuisine(req, res) {
 	console.log('length:', selectedIngredients.length);
 	if(selectedIngredients.length){
 		query = `
-		SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
-		FROM Dishes d
-		WHERE ${subquery}
-		GROUP BY d.cuisine
-		ORDER BY freq DESC
+		select * From
+			(SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
+			FROM Dishes d
+			WHERE (${subquery})
+			GROUP BY d.cuisine
+			ORDER BY freq DESC)
+		WHERE ROWNUM <= ${display}
 	`;
 	}
 	else{
 		query = `
 		SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
 		FROM Dishes d
+		WHERE rownum <= ${display}
 		GROUP BY d.cuisine
-		ORDER BY freq DESC
+		ORDER BY freq DESC	
 	`;
 	}
 	console.log(query);

@@ -15,9 +15,16 @@ export default class SearchByIngredients extends React.Component {
       selectedIngredients: [],
       selectedOptions: [],
       matchedCuisines: [],
-      currSet: new Set(),
       checked: [],
-      value: []
+      value: [],
+      displayOptions: [
+        { value: 1, label: '1' },
+        { value: 2, label: '2' },
+        { value: 3, label: '3' },
+        { value: 4, label: '4' },
+        { value: 5, label: '5' },
+      ],
+      selectedDisplay: 0
     }
   }
 
@@ -87,7 +94,10 @@ export default class SearchByIngredients extends React.Component {
         return ingredient.value;
       });
       console.log('let lelection:', selection);
-      let data = { selection: selection }
+      let data = { 
+        selection: selection,
+        display: this.state.selectedDisplay.value
+      }
       console.log('data:', data);
       fetch("http://localhost:8081/matchedCuisines", {
         method: "POST",
@@ -125,6 +135,13 @@ export default class SearchByIngredients extends React.Component {
     }
     console.log('display matchedCuisines:', this.state.matchedCuisines);
   }
+
+  handleDisplayChange = selectedDisplay => {
+    this.setState(
+      { selectedDisplay },
+      () => console.log(`Display selected:`, this.state.selectedDisplay)
+    );
+  };
 
   onChange(e, i){
     let value = this.state.value.slice();
@@ -185,6 +202,14 @@ export default class SearchByIngredients extends React.Component {
             <div className="headers">
               <div className="header"><strong>Cuisine Type</strong></div>
               <div className="header"><strong>Matching Scores</strong></div>
+              <Select
+                styles={selectStyles}
+                value={this.state.selectedDisplay}
+                placeholder="Filter Top Cuisine(s)... "
+                size={50}
+                options={this.state.displayOptions}
+                onChange={this.handleDisplayChange}
+              />
             </div>
           </div>
 
