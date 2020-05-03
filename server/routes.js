@@ -565,6 +565,31 @@ async function getCuisinesMinusIngredients(req, res) {
 	}
 }
 
+/* ---- (get cities from state) ---- */
+async function getCitiesFromState(req, res) {
+	const state = req.params.state;
+	const query = `SELECT DISTINCT city FROM Restaurants WHERE state='${state}' `;
+	let connection;
+
+	try {
+		let pool = await getPool();
+		connection = await pool.getConnection();
+		let result = await connection.execute(query);
+		console.log("Result: ", result);
+		res.json(result);
+	} catch (e) {
+		console.log(e);
+	} finally {
+		if (connection) {
+			try {
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+}
+
 // Cleanup function
 async function cleanup() {
 	if (pool) await pool.close();
@@ -578,7 +603,7 @@ module.exports = {
 	cleanup: cleanup,
 	getAllIngredients: getAllIngredients,
 	getSearchedIngredient: getSearchedIngredient,
-    getAllCuisines: getAllCuisines,
+  getAllCuisines: getAllCuisines,
 	getMatchedCuisine: getMatchedCuisine,
 	getFreq: getFreq,
 	getAllCuisineTypes: getAllCuisineTypes,
@@ -586,4 +611,5 @@ module.exports = {
 	getRelatedCuisines: getRelatedCuisines,
 	getNearbyRestaurants: getNearbyRestaurants,
 	getCuisinesMinusIngredients: getCuisinesMinusIngredients,
+	getCitiesFromState : getCitiesFromState,
 }
