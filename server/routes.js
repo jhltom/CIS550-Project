@@ -190,7 +190,7 @@ async function getMatchedCuisine(req, res) {
 	let subquery = ``;
 	for(i = 0; i < selectedIngredients.length; i++){
 		if(i > 0){
-			subquery += 'AND';
+			subquery += 'OR';
 		}
 		subquery += `
 			EXISTS(
