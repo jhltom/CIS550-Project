@@ -190,6 +190,41 @@ async function getAllCuisines(req, res) {
 
 /* ---- (matched cuisine) ---- */
 async function getMatchedCuisine(req, res) {
+
+	let connection0;
+	const query0 = `
+		SELECT Distinct d.cuisine AS cuisine, COUNT(*) AS freq
+		FROM Dishes d
+		GROUP BY d.cuisine
+		ORDER BY freq DESC
+	`;
+	let result0;
+
+	try {
+		// Get connection pool
+		let pool = await getPool();
+
+		// Obtain single connection from pool
+		connection0 = await pool.getConnection();
+
+		// Query the db
+		result0 = await connection0.execute(query0);
+		
+	} catch (e) {
+		console.log(e);
+
+	} finally {
+		if (connection0) {
+			try {
+				// Close connection and return it to the pool
+				await connection0.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+	console.log(result0);
+
 	console.log('call getMatchedCuisine on server');
 	console.log(req.body.data);
 	console.log('after print');
@@ -216,12 +251,11 @@ async function getMatchedCuisine(req, res) {
 	if(selectedIngredients.length){
 		query = `
 		select * From
-			(SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
+			(SELECT DISTINCT d.cuisine AS cuisine, COUNT(d.dishid) as freq
 			FROM Dishes d
 			WHERE (${subquery})
 			GROUP BY d.cuisine
 			ORDER BY freq DESC)
-		WHERE ROWNUM <= ${display}
 	`;
 	}
 	else{
@@ -245,10 +279,23 @@ async function getMatchedCuisine(req, res) {
 
 		// Obtain single connection from pool
 		connection = await pool.getConnection();
-
 		// Query the db
 		let result = await connection.execute(query);
+		for(let i = 0; i < result.rows.length; i++){
+			for(let j = 0; j < result0.rows.length; j++){
+				if(result.rows[i][0] == result0.rows[j][0]){
+					result.rows[i][1] = ((result.rows[i][1] / result0.rows[j][1]) * 100);
+				}
+			}	
+		}
 
+		result.rows.sort((x, y) => {
+			const X = x[1];
+			const Y = y[1];
+			return X < Y ? 1 : X > Y ? -1 : 0;
+		  });
+		  console.log(result.rows);
+		result.rows = result.rows.slice(0, display);
 		// Send response
 		console.log("Result: ", result);
 		res.json(result);

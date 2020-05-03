@@ -163,13 +163,13 @@ export default class SearchByIngredients extends React.Component {
       }).then(async result => {
         console.log('matched cuisines', result.rows);
         let matchedCuisines = result.rows.map((cuisine, i) => {
-          for(let h = 0; h < this.state.freq.length; h++){
-            console.log('enter loop');
-            if(cuisine[0] == this.state.freq[h].cuisine){
-              cuisine[1] = ((cuisine[1] / this.state.freq[h].freq) * 100).toFixed(2);
-              console.log('weighted:', cuisine[1]);
-            }
-          }
+          // for(let h = 0; h < this.state.freq.length; h++){
+          //   console.log('enter loop');
+          //   if(cuisine[0] == this.state.freq[h].cuisine){
+          //     cuisine[1] = ((cuisine[1] / this.state.freq[h].freq) * 100).toFixed(2);
+          //     console.log('weighted:', cuisine[1]);
+          //   }
+          // }
           return (
             <div key={i} className="cuisine">
               <div className="cuisineName">{cuisine[0]}</div>
