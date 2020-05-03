@@ -41,17 +41,6 @@ export default class Feature3 extends React.Component {
     const longitude = position.coords.longitude;
 
     this.setState({ lat: latitude, lng: longitude, loading: false });
-    
-    // const gMapScript = document.createElement("script");
-    // gMapScript.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDOrXq_0ahcTlnhzfjrS7ruzV6Hk_v63So";
-
-    // window.document.body.appendChild(gMapScript);
-    // gMapScript.addEventListener("load", () => {
-    //   this.googleMap = this.initMap();
-    // });
-
-    // document.getElementById("loader").style.display = "none";
-    // document.getElementById("gmap").style.display = "block";
   }
 
   error = () => {
@@ -59,10 +48,7 @@ export default class Feature3 extends React.Component {
   }
 
   componentDidMount = async () => {
-    // document.getElementById("gmap").style.display = "none";
-    // document.getElementById("loader").style.display = "block";
-
-    this.fetchRestaurantsFromSearchByCuisines(); //Tom: handle data from SearchByCuisines component
+    // this.fetchRestaurantsFromSearchByCuisines(); //Tom: handle data from SearchByCuisines component
 
     await this.fetchCuisines();
 
@@ -85,57 +71,27 @@ export default class Feature3 extends React.Component {
   }
 
   fetchCuisines = async () => {
-    // const response = await fetch("http://localhost:8081/cuisineTypesFull",
-    //   {
-    //     method: "GET",
-    //     headers: {
-    //       "Content-Type": "application/json"
-    //     }
-    //   }
-    // );
-    // const body = await response.json();
+    const response = await fetch("http://localhost:8081/cuisineTypesFull",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    const body = await response.json();
 
-    // const data = body.rows.map(row => {
-    //   return {
-    //     value: row[0],
-    //     label: row[1]
-    //   }
-    // });
+    const data = body.data.map(row => {
+      return {
+        value: row.CUISINEID,
+        label: row.CUISINE
+      }
+    });
 
-    const data = [{ value: 9, label: "Korean"}];
+    // const data = [{ value: 9, label: "Korean"}];
 
     this.setState({ allCuisines: data });
     return;
-  }
-
-  initMap = () => {
-    let stylesArray = [{"featureType":"water","stylers":[{"color":"#46bcec"},{"visibility":"on"}]},{"featureType":"landscape","stylers":[{"color":"#f2f2f2"}]},{"featureType":"road","stylers":[{"saturation":-100},{"lightness":45}]},{"featureType":"road.highway","stylers":[{"visibility":"simplified"}]},{"featureType":"road.arterial","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"color":"#444444"}]},{"featureType":"transit","stylers":[{"visibility":"off"}]},{"featureType":"poi","stylers":[{"visibility":"off"}]}];
-    let mapType = window.google.maps.MapTypeId.ROADMAP;
-    let map = new window.google.maps.Map(this.googleMap.current, {
-      zoom: 15,
-      center: {
-        lat: this.state.lat,
-        lng: this.state.lng
-      },
-      disableDefaultUI: true,
-      mapTypeId: mapType,
-      styles: stylesArray
-    });
-
-    let origin = new window.google.maps.Marker({
-      position: {
-        lat: this.state.lat,
-        lng: this.state.lng
-      },
-      map: map
-    })
-
-    this.setState({ map: map, origin: origin });
-
-    document.getElementById("loader").style.display = "none";
-    document.getElementById("gmap").style.display = "block";
-
-    this.setState({ loading: false });
   }
 
   handleCuisineSelect = async selectedCuisine => {
