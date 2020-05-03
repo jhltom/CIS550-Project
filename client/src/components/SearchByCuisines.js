@@ -78,6 +78,34 @@ export default class SearchByCuisines extends React.Component {
         console.log(err);
       });
   }
+  fetchCities = async(state) =>{
+    console.log(state)
+    await fetch("http://localhost:8081/cities/"+state,
+      {
+        method: 'GET'
+      }).then(res => {
+        return res.json();
+      }, err => {
+        console.log(err);
+      }).then(result => {
+        console.log("result: ", result)
+        let citiesOptions = result.rows.map((row, i) => {
+          const citiesOption = row[0].trim();
+          return ({
+            value: citiesOption,
+            label: citiesOption
+          })
+        });
+        citiesOptions.sort((x, y) => {
+          const X = x.value.toUpperCase();
+          const Y = y.value.toUpperCase();
+          return X < Y ? -1 : X > Y ? 1 : 0;
+        });
+        this.setState({ citiesOptions });
+      }, err => {
+        console.log(err);
+      });
+  }
 
   /**
    * State handlers
@@ -102,7 +130,8 @@ export default class SearchByCuisines extends React.Component {
     this.setState({ selectedCities, _selectedCities });
   }
   handleStateChange = (selectedState) => {
-    this.setState({ selectedState, _selectedState: selectedState.value });
+    this.setState({ selectedState, _selectedState: selectedState.value, selectedCities: [], _selectedCities: [] });
+    this.fetchCities(selectedState.value);
   }
 
   validateSearch = () => {
