@@ -5,9 +5,8 @@ import {
   Form,
   Button,
   Modal,
-  Row,
-  Col
 } from "react-bootstrap";
+import Select from 'react-select';
 import { API, Auth } from 'aws-amplify'
 import '../style/UserPage.css';
 
@@ -16,10 +15,12 @@ export default class UserPage extends React.Component {
     super(props);
     this.state = {
       userLogged: false,
+      userId: "",
       firstName: "",
       lastName: "",
       favoriteCuisines: [],
-
+      loading: true,
+      updated: false
     }
   }
 
@@ -30,13 +31,17 @@ export default class UserPage extends React.Component {
       .then(async user => {
         this.setState({ userLogged: true });
         const userId = user.username;
+        console.log(userId)
+        this.setState({userId});
         const response = await API.get("cis550proj", `/users/${userId}`);
         console.log("Result: ", response);
         this.setState({
           firstName: response[0].firstName,
           lastName: response[0].lastName,
           favoriteCuisines: response[0].favoriteCuisines
-        })
+        }, () => this.setState({ loading: false }));
+
+        await this.getCuisineTypes();
 
       })
       //if not logged in
@@ -47,38 +52,98 @@ export default class UserPage extends React.Component {
 
   }
 
+  getCuisineTypes = async () => {
+    await fetch("http://localhost:8081/cuisineTypes/",
+      {
+        method: 'GET'
+      }).then(res => {
+        return res.json();
+      }, err => {
+        console.log(err);
+      }).then(result => {
+        let cuisineOptions = result.rows.map((row, i) => {
+          const cuisineType = row[0].trim();
+          return ({
+            value: cuisineType,
+            label: cuisineType
+          })
+        });
+        cuisineOptions.sort((x, y) => {
+          const X = x.value.toUpperCase();
+          const Y = y.value.toUpperCase();
+          return X < Y ? -1 : X > Y ? 1 : 0;
+        });
+        this.setState({ cuisineOptions });
+      }, err => {
+        console.log(err);
+      });
+  }
+
+  handleCuisinesChange = (favoriteCuisines) => {
+    this.setState(
+      { favoriteCuisines },
+      () => console.log(`Option selected:`, this.state.favoriteCuisines)
+    );
+  }
+  updateCuisines = async() =>{
+    console.log("update called: ",this.state.userId)
+    await API.post("cis550proj", "/users", {
+      body: {
+        id: this.state.userId,
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        favoriteCuisines: this.state.favoriteCuisines
+      }
+    });
+    this.setState({updated: true})
+  }
+
   render() {
 
     return (
-      <div>
+      <div className="container-user">
         {this.state.userLogged ?
-          <Modal.Body>
-            <Form>
+          <div>
+            {this.state.loading ?
+              <div >
+                <Spinner animation="border" />
+              </div>
+              :
 
-              <Form.Group >
-                <Form.Label>First name: </Form.Label>
-                &nbsp;&nbsp;&nbsp;
-                <Form.Label>{this.state.firstName}</Form.Label>
-              </Form.Group>
+              <div>
+                <Modal.Body>
+                  <Form>
+                    <Form.Group>
+                      <Form.Label>Last Name</Form.Label>
+                      <Form.Control type="text" placeholder="Enter last name" value={this.state.lastName} />
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label>First Name</Form.Label>
+                      <Form.Control type="text" placeholder="Enter first name" value={this.state.firstName} />
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label>Favorite Cuisines</Form.Label>
+                      <Select
+                        isMulti
+                        value={this.state.favoriteCuisines}
+                        isSearchable
+                        placeholder="Select cuisine(s) ... "
+                        size={50}
+                        options={this.state.cuisineOptions}
+                        onChange={this.handleCuisinesChange}
+                      />
+                    </Form.Group>
+                    {this.state.updated? <div> Updated Successfully! </div> : <div></div>}
+                  </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="primary" onClick={this.updateCuisines}>Update</Button>
+                </Modal.Footer>
+              </div>
 
+            }
 
-              <Form.Group >
-                <Form.Label>Last name: </Form.Label>
-                &nbsp;&nbsp;&nbsp;
-                <Form.Label>{this.state.lastName}</Form.Label>
-              </Form.Group>
-
-              <Form.Group>
-                <Form.Label> Favorite Cuisines: </Form.Label>
-                {this.state.favoriteCuisines.map((val, i ) =>{
-                  return(
-                    <Form.Control plaintext readOnly defaultValue={val.label} key={i} />
-                  )
-                })}
-              </Form.Group>
-
-            </Form>
-          </Modal.Body>
+          </div>
 
           :
           <div> No User Logged! </div>

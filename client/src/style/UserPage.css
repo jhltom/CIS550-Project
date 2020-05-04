@@ -1,6 +1,6 @@
 .container-user{
-  display: flex;
+  /* display: flex; */
   align-items: center;
   justify-content: center;
-  height: 70vh;
+  width: 100%;
 }
