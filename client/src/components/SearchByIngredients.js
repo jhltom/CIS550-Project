@@ -187,7 +187,7 @@ export default class SearchByIngredients extends React.Component {
           return (
             <div key={i} className="cuisine">
               <div className="cuisineName">{cuisine[0]}</div>
-              <div className="matchingScore">{cuisine[1]}%</div>
+              <div className="matchingScore">{cuisine[1].toFixed(2)}%</div>
             </div>
           )
         });
@@ -271,7 +271,7 @@ validateSearch = () => {
   return (
     this.state._selectedCities.length > 0 &&
     this.state._selectedState.length > 0 &&
-    this.state._selectedCuisines.length > 0
+    this.state.matchedCuisines.length > 0
   )
 }
 handleCurrentLocation = () => {
@@ -369,19 +369,72 @@ handleSanFrancisco = () => {
             options={this.state.ingredientsOptions}
             onChange={this.handleSelectedChange}
           />
+          <div > &nbsp; &nbsp;</div>
           <div class="Checkbox">
             <Checkbox
               type="checkbox"
+              style={{display: 'inline-flex', flexDirection: 'row'}}
               checked={this.state.checked}
               onClick={this.handleCheck}
-            />
-            <label>Select All Types</label>
+            /> <label>Select All Types</label>      
           </div>
+          <div > &nbsp; &nbsp;</div>
           <Button type="submit" onClick={this.getCuisines}>See Cuisines</Button>
 
         </div>
 
-        <div className="rows3">
+        <br></br>
+        <br></br>
+        <br></br>
+
+
+        <div className="header-container">
+            <div className="headers">
+              <div className="header"><strong>Cuisine Type</strong></div>
+              <div className="header"><strong>Matching Scores</strong></div>
+              <Select
+                styles={selectStyles}
+                placeholder = {''}
+                value={this.state.selectedDisplay}
+                size={50}
+                options={this.state.displayOptions}
+                onChange={this.handleDisplayChange}
+              />
+              <div>Filter Top Cuisine(s)</div>
+            </div>
+          </div>
+
+          <div className="results-container" id="results">
+            {this.state.matchedCuisines}
+          </div>
+
+
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>          
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+
+
+
+
+          <div className="rows3">
           <IconContext.Provider value={{ style: { color: 'white', marginRight: '5' } }}>
             <TiLocation size={35} />
           </IconContext.Provider>
@@ -410,32 +463,20 @@ handleSanFrancisco = () => {
             onChange={this.handleCitiesChange}
           />
 
+          <div > &nbsp; &nbsp;</div>
+
+          <Link
+            to={{
+              pathname: `/Feature3`,
+              state: {// place data you want to send here!
+                selectedCities: this.state._selectedCities,
+                selectedState: this.state._selectedState,
+                selectedCuisines: this.state.matchedCuisines,
+              }
+            }}><Button type="submit" disabled={!this.validateSearch()} > See Restaurants </Button>
+          </Link>
+
         </div>
-
-        <div className="rows">
-
-          
-        </div>
-
-
-        <div className="header-container">
-            <div className="headers">
-              <div className="header"><strong>Cuisine Type</strong></div>
-              <div className="header"><strong>Matching Scores</strong></div>
-              <Select
-                styles={selectStyles}
-                value={this.state.selectedDisplay}
-                placeholder="Filter Top Cuisine(s)... "
-                size={50}
-                options={this.state.displayOptions}
-                onChange={this.handleDisplayChange}
-              />
-            </div>
-          </div>
-
-          <div className="results-container" id="results">
-            {this.state.matchedCuisines}
-          </div>
 
 
         {/* <div>
@@ -448,6 +489,8 @@ handleSanFrancisco = () => {
               )
            })}      
       </div> */}
+
+
 
       </div>
 

@@ -43,6 +43,17 @@
   /* width: 100% */
 }
 
+.header-container, .header-container .headers, .header-container .headers .header {
+
+  align-items: center;
+  text-align: center;
+  flex: 1 0 50%;
+}
+
+
+
+
+
 
 
 .SearchPage-logo {

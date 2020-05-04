@@ -277,7 +277,6 @@ async function getMatchedCuisine(req, res) {
 		query = `
 		SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
 		FROM Dishes d
-		WHERE rownum <= ${display}
 		GROUP BY d.cuisine
 		ORDER BY freq DESC	
 	`;
