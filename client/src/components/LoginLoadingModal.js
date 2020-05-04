@@ -106,7 +106,8 @@ class LoginLoadingModal extends React.Component {
         id: this.state.userId,
         firstName: this.state.firstName,
         lastName: this.state.lastName,
-        favoriteCuisines: this.state.selectedCuisines
+        favoriteCuisines: this.state.selectedCuisines,
+        favoriteRestaurants: []
       }
     });
     

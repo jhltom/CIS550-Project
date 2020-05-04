@@ -16,7 +16,14 @@ html, body, #gmap {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	flex-direction: column;
 	background: #e3e3e3;
+}
+
+.selectLabels, .selectInputs {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .displaySection {
@@ -97,10 +104,14 @@ html, body, #gmap {
 	font-size: 2em;
 }
 
-.selectItem {
+.selectItem, .selectLabel {
 	padding: 0, 1em,0, 1em;
 	margin-right: 1em;
 	width: 20vw;
+}
+
+.sm-flex {
+	width: 10vw;
 }
 
 #gmap {

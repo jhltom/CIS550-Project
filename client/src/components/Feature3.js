@@ -24,6 +24,7 @@ export default class Feature3 extends React.Component {
       selectedCities: [],
       selectedState: null,
       allCuisines: [],
+      allCities: [],
       radius: { value: 2, label: '2' },
       radii: [
         { value: 1, label: '1' },
@@ -32,6 +33,7 @@ export default class Feature3 extends React.Component {
         { value: 4, label: '4' },
         { value: 5, label: '5' },
       ],
+      unfiltered: [],
       restaurants: [],
       useLocation: false,
     }
@@ -76,11 +78,19 @@ export default class Feature3 extends React.Component {
         }
       });
 
+      let cities = selectedCities.map(function(city) {
+        return {
+          value: city,
+          label: city
+        }
+      });
+
       this.setState(
         { allCuisines: data,
           selectedCuisines: data,
           selectedState: selectedState,
-          selectedCities: selectedCities,
+          allCities: cities,
+          selectedCities: cities,
           useLocation: selectedState === "Current Location"
         }, () => {
         if (selectedState === "Current Location") {
@@ -152,10 +162,13 @@ export default class Feature3 extends React.Component {
     let selection = this.state.selectedCuisines.map(cuisine => {
       return cuisine.value;
     });
+    let cities = this.state.selectedCities.map(city => {
+      return city.value;
+    });
     let payload1 = {
       selection: selection,
       state: this.state.selectedState,
-      cities: this.state.selectedCities
+      cities: cities
     }
 
     const response_r = await fetch("http://localhost:8081/restaurantConditions",
@@ -204,7 +217,10 @@ export default class Feature3 extends React.Component {
       r.hours = info;
     });
 
-    this.setState({ loading: false, restaurants: preHours });
+    let origin = this.state.origin;
+    origin.setMap(null);
+
+    this.setState({ loading: false, unfiltered: preHours, restaurants: preHours, origin: null });
     this.updateMap(preHours);
   }
 
@@ -293,7 +309,83 @@ export default class Feature3 extends React.Component {
   }
 
   handleCuisineSelect = async selectedCuisine => {
-    this.setState({ selectedCuisines: selectedCuisine });
+    selectedCuisine = selectedCuisine ? selectedCuisine : [];
+
+    this.setState({ selectedCuisines: selectedCuisine }, () => {
+      let all = this.state.selectedCuisines.length === this.state.allCuisines.length;
+      let none = this.state.selectedCuisines.length === 0;
+      let emptyField = this.state.selectedCities.length === 0;
+      let filtered = this.state.unfiltered;
+
+      if (!all && !none && !emptyField) {
+        let cuisineSet = new Set(this.state.selectedCuisines.map(function(obj) {
+          return obj.value;
+        }));
+
+        let citiesSet = new Set(this.state.selectedCities.map(function(obj) {
+          return obj.value;
+        }));
+
+        filtered = filtered.filter(function(r) {
+          let cuisineIds = r.CUISINEIDS.trim().split(",").map(function(id) {
+            return parseInt(id);
+          });
+
+          let pass = cuisineIds.map(function(id) {
+            return cuisineSet.has(id);
+          }).reduce(function(result, item) {
+            return result || item;
+          }, false);
+
+          return pass && citiesSet.has(r.CITY);
+        });
+      }
+
+      filtered = (none || emptyField) ? [] : filtered;
+
+      this.setState({ restaurants: filtered });
+      this.updateMap(filtered);
+    });
+  }
+
+  handleCitySelect = async selectedCities => {
+    selectedCities = selectedCities ? selectedCities : [];
+
+    this.setState({ selectedCities: selectedCities }, () => {
+      let all = this.state.selectedCities.length === this.state.allCities.length;
+      let none = this.state.selectedCities.length === 0;
+      let emptyField = this.state.selectedCuisines.length === 0;
+      let filtered = this.state.unfiltered;
+
+      if (!all && !none && !emptyField) {
+        let cuisineSet = new Set(this.state.selectedCuisines.map(function(obj) {
+          return obj.value;
+        }));
+
+        let citiesSet = new Set(this.state.selectedCities.map(function(obj) {
+          return obj.value;
+        }));
+
+        filtered = filtered.filter(function(r) {
+          let cuisineIds = r.CUISINEIDS.trim().split(",").map(function(id) {
+            return parseInt(id);
+          });
+
+          let pass = cuisineIds.map(function(id) {
+            return cuisineSet.has(id);
+          }).reduce(function(result, item) {
+            return result || item;
+          }, false);
+
+          return pass && citiesSet.has(r.CITY);
+        });
+      }
+
+      filtered = (none || emptyField) ? [] : filtered;
+
+      this.setState({ restaurants: filtered });
+      this.updateMap(filtered);
+    });
   }
 
   handleRadiusSelect = async selectedRadius => {
@@ -396,33 +488,50 @@ export default class Feature3 extends React.Component {
         </div>
         }
         <div className="selectSection">
-          <div className="selectItem">
-            <Select
-              value={this.state.selectedCuisines}
-              options={this.state.allCuisines}
-              onChange={this.handleCuisineSelect}
-              isMulti
-              isSearchable
-              placeholder="Select Cuisine(s) ... "
-            />
+          <div className="selectLabels">
+            <div className="selectLabel"><h4>Cuisines</h4></div>
+            <div className="selectLabel"><h4>Cities</h4></div>
+            <div className="selectLabel"><h4>Radius (Miles)</h4></div>
+            <div className="sm-flex"></div>
           </div>
+          <div className="selectInputs">
+            <div className="selectItem">
+              <Select
+                value={this.state.selectedCuisines}
+                options={this.state.allCuisines}
+                onChange={this.handleCuisineSelect}
+                isMulti
+                isSearchable
+                placeholder="Select Cuisine(s) ... "
+              />
+            </div>
+            <div className="selectItem">
+              <Select
+                value={this.state.selectedCities}
+                options={this.state.allCities}
+                onChange={this.handleCitySelect}
+                isMulti
+                isSearchable
+                placeholder="Select City(s) ... "
+              />
+            </div>
+            <div className="selectItem">
+              <Select
+                value={this.state.radius}
+                options={this.state.radii}
+                onChange={this.handleRadiusSelect}
+                placeholder="Select Radius (Miles) ... "
+                isDisabled={!this.state.useLocation}
+              />
+            </div>
 
-          <div className="selectItem">
-            <Select
-              value={this.state.radius}
-              options={this.state.radii}
-              onChange={this.handleRadiusSelect}
-              placeholder="Select Radius (Miles) ... "
-              isDisabled={!this.state.useLocation}
-            />
+            <Button
+              className="sm-flex"
+              variant="primary"
+              disabled={this.state.loading || !this.state.useLocation}
+              onClick={this.handleClick}
+            >Update</Button>
           </div>
-
-          <Button
-            variant="primary"
-            disabled={this.state.loading || !this.state.useLocation}
-            onClick={this.handleClick}
-          >Update</Button>
-
         </div>
 
         <div className="displaySection">

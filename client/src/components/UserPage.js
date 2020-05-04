@@ -94,12 +94,13 @@ export default class UserPage extends React.Component {
   }
   updateCuisines = async() =>{
     console.log("update called: ",this.state.userId)
-    await API.post("cis550proj", "/users", {
+    await API.put("cis550proj", "/users", {
       body: {
         id: this.state.userId,
         firstName: this.state.firstName,
         lastName: this.state.lastName,
-        favoriteCuisines: this.state.favoriteCuisines
+        favoriteCuisines: this.state.favoriteCuisines,
+        favoriteRestaurants: this.state.favoriteRestaurants
       }
     });
     this.setState({updated: true})
