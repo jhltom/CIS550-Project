@@ -15,15 +15,7 @@ export default class SearchByCuisines extends React.Component {
 
       userId: "",
 
-      cuisineOptions: [
-        { value: 'American', label: 'American' },
-        { value: 'Chinese', label: 'Chinese' },
-        { value: 'French', label: 'French' },
-        { value: 'Indian', label: 'Indian' },
-        { value: 'Korean', label: 'Korean' },
-        { value: 'Mexican', label: 'Mexican' },
-        { value: 'Spanish', label: 'Spanish' },
-      ],
+      cuisineOptions: [],
       citiesOptions: [],
       stateOptions: [
         { value: 'CA', label: 'CA' },
