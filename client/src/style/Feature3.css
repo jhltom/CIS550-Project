@@ -22,6 +22,59 @@ html, body, #gmap {
 	height: 80vh;
 	width: 40vw;
 	position: relative;
+	overflow-y: auto;
+}
+
+.restaurant {
+	height: 150px;
+	display: flex;
+	position: relative;
+	box-shadow: 1px 1px 8px #888;
+	text-align: left;
+	margin: 5px;
+}
+
+/*.restaurant::after {
+	content: "";
+	display: block;
+	width: 100%;
+	background: #aaa;
+	height: 1px;
+	position: absolute;
+	bottom: 0;
+}*/
+
+.restaurant:hover {
+	background: #e8e8e8;
+	transition: background 0.3s;
+}
+
+.restaurant > .thumb {
+	width: 25%;
+	height: 100%;
+	background: #888;
+	box-sizing: border-box;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.restaurant > .content {
+	width: 75%;
+	padding-left: 10px;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.content > p {
+	margin-bottom: 0 !important;
+}
+
+.thumb > img {
+	height: 50px;
+	width: 50px;
 }
 
 .noResults {
