@@ -9,10 +9,15 @@ export default class RestaurantCard extends React.Component {
 
   render() {
     return (
-      <div className="row">
-        <div className="name">{this.props.restaurant.name}</div>
-        <div className="rating">{this.props.restaurant.rating}</div>
-        <div className="reviews">{this.props.restaurant.review_count}</div>
+      <div className="restaurant">
+        <div className="thumb">
+          <img src="/marker.png" />
+        </div>
+        <div className="content">
+          <h3>{this.props.restaurant.NAME}</h3>
+          <p>{this.props.restaurant.ADDRESS}</p>
+          <p>Rating: {this.props.restaurant.STARS}</p>
+        </div>
       </div>
     );
   }
