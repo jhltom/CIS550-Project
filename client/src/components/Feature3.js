@@ -56,7 +56,7 @@ export default class Feature3 extends React.Component {
   }
 
   componentDidMount = async () => {
-    // this.fetchRestaurantsFromSearchByCuisines(); //Tom: handle data from SearchByCuisines component
+    this.fetchRestaurantsFromSearchByCuisines(); //Tom: handle data from SearchByCuisines component
 
     await this.fetchCuisines();
 

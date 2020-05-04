@@ -55,7 +55,7 @@ export default class SearchByCuisines extends React.Component {
    * When component mounts: 
    */
   componentDidMount = async () => {
-    // await this.getCuisineTypes();
+    await this.getCuisineTypes();
     await Auth.currentAuthenticatedUser()
       //if logged in already
       .then(async user => {
@@ -68,7 +68,7 @@ export default class SearchByCuisines extends React.Component {
       })
   }
   getCuisineTypes = async () => {
-    await fetch("http://localhost:8081/cuisineTypes/",
+    await fetch("http://localhost:8081/cuisineTypesFull/",
       {
         method: 'GET'
       }).then(res => {
@@ -76,16 +76,18 @@ export default class SearchByCuisines extends React.Component {
       }, err => {
         console.log(err);
       }).then(result => {
-        let cuisineOptions = result.rows.map((row, i) => {
-          const cuisineType = row[0].trim();
+        console.log(result)
+        let cuisineOptions = result.data.map((row, i) => {
+          const cuisineType = row.CUISINE;
+          const cuisineId = row.CUISINEID;
           return ({
-            value: cuisineType,
+            value: cuisineId,
             label: cuisineType
           })
         });
         cuisineOptions.sort((x, y) => {
-          const X = x.value.toUpperCase();
-          const Y = y.value.toUpperCase();
+          const X = x.label.toUpperCase();
+          const Y = y.label.toUpperCase();
           return X < Y ? -1 : X > Y ? 1 : 0;
         });
         this.setState({ cuisineOptions });
