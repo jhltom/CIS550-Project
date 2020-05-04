@@ -309,7 +309,7 @@ async function getMatchedCuisine(req, res) {
 			return X < Y ? 1 : X > Y ? -1 : 0;
 		  });
 		  console.log(result.rows);
-		result.rows = result.rows.slice(0, display);
+		// result.rows = result.rows.slice(0, display);
 		// Send response
 		console.log("Result: ", result);
 		res.json(result);

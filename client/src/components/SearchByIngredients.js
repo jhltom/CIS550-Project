@@ -15,11 +15,13 @@ export default class SearchByIngredients extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+
       ingredientsOptions: [],
       search: null,
       selectedIngredients: [],
       selectedOptions: [],
       matchedCuisines: [],
+      displayCuisines: [],
       checked: false,
       //value: [],
       displayOptions: [
@@ -29,7 +31,7 @@ export default class SearchByIngredients extends React.Component {
         { value: 4, label: '4' },
         { value: 5, label: '5' },
       ],
-      selectedDisplay: 0,
+      selectedDisplay: 20,
       freq: [],
 
 
@@ -206,7 +208,8 @@ export default class SearchByIngredients extends React.Component {
             </div>
           )
         });
-        this.setState({ matchedCuisines: matchedCuisines });
+        this.setState({ matchedCuisines: result.rows });
+        this.setState({displayCuisines: matchedCuisines});
 
         let _selectedCuisines = [];
         result.rows.map((cuisine ) => {
@@ -226,14 +229,44 @@ export default class SearchByIngredients extends React.Component {
         </div>
       ];
       this.setState({ matchedCuisines: matchedCuisines });
+      this.setState({displayCuisines: matchedCuisines});
     }
   }
 
   handleDisplayChange = selectedDisplay => {
+    let display = selectedDisplay.value;
     this.setState(
-      { selectedDisplay },
+      {selectedDisplay: display},
       () => console.log(`Display selected:`, this.state.selectedDisplay)
     );
+      
+    let slice = this.state.matchedCuisines.slice(0, display);
+    console.log('slice:', slice);
+
+    let displayCuisines = slice.map((cuisine, i) => {
+      return (
+        <div key={i} className="cuisine">
+          <div className="cuisineName">{cuisine[0]}</div>
+          <div className="matchingScore">{cuisine[1].toFixed(2)}%</div>
+        </div>
+      )
+    });
+
+    this.setState(
+      {displayCuisines: displayCuisines},
+      () => console.log('displayCuisines:', this.state.displayCuisines)
+    );
+
+
+    let _selectedCuisines = [];
+    slice.map((cuisine ) => {
+      _selectedCuisines.push(cuisine[0]);
+    });
+    this.setState(
+      { _selectedCuisines: _selectedCuisines },
+      () => console.log('_selectedCuisines:', _selectedCuisines )
+    );    
+
   };
 
 //   onChange(e, i){
@@ -293,7 +326,7 @@ validateSearch = () => {
   return (
     this.state._selectedCities.length > 0 &&
     this.state._selectedState.length > 0 &&
-    this.state.matchedCuisines.length > 0
+    this.state.displayCuisines.length > 0
   )
 }
 handleCurrentLocation = () => {
@@ -445,7 +478,7 @@ error = () => {
           </div>
 
           <div className="results-container" id="results">
-            {this.state.matchedCuisines}
+            {this.state.displayCuisines}
           </div>
 
 
