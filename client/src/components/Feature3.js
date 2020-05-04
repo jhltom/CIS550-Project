@@ -19,13 +19,13 @@ export default class Feature3 extends React.Component {
     this.markers = [];
     this.state = {
       map: null,
-      lat: 0,
-      lng: 0,
+      lat: 39.9522188,
+      lng: -75.1954024,
       origin: null,
       loading: true,
       selectedCuisines: [],
       allCuisines: [],
-      radius: null,
+      radius: { value: 2, label: '2' },
       radii: [
         { value: 1, label: '1' },
         { value: 2, label: '2' },
@@ -38,19 +38,52 @@ export default class Feature3 extends React.Component {
     }
   }
 
-  success = position => {
+  success = async position => {
     const latitude = position.coords.latitude;
     const longitude = position.coords.longitude;
 
-    this.setState({ lat: latitude, lng: longitude, loading: false });
-    
-    const gMapScript = document.createElement("script");
-    gMapScript.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_MAPS_API_KEY}`;
+    let updateOrigin = this.state.origin;
 
-    window.document.body.appendChild(gMapScript);
-    gMapScript.addEventListener("load", () => {
-      this.initMap();
+    if (latitude !== this.state.lat || longitude !== this.state.lng) {
+      updateOrigin.setMap(null);
+
+      updateOrigin = new window.google.maps.Marker({
+        position: {
+          lat: latitude,
+          lng: longitude
+        },
+        animation: window.google.maps.Animation.DROP,
+        map: this.state.map
+      });
+    }
+
+    let selection = this.state.selectedCuisines.map(cuisine => {
+      return cuisine.value;
     });
+    let data = {
+      lat: latitude,
+      lng: longitude,
+      radius: 3,
+      selection: selection
+    }
+
+    const response = await fetch("http://localhost:8081/restaurantsNearby",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({data: data})
+      }
+    );
+    const body = await response.json();
+    this.setState({ lat: latitude,
+                    lng: longitude,
+                    loading: false,
+                    restaurants: body.data,
+                    origin: updateOrigin
+                  });
+    this.updateMap(body.data);
   }
 
   error = () => {
@@ -58,25 +91,55 @@ export default class Feature3 extends React.Component {
   }
 
   componentDidMount = async () => {
-    this.fetchRestaurantsFromSearchByCuisines(); //Tom: handle data from SearchByCuisines component
+    const gMapScript = document.createElement("script");
+    gMapScript.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_MAPS_API_KEY}`;
 
-    // await this.fetchCuisines();
-
-    if (!navigator.geolocation) {
-      console.log("Geolocation isn't supported on your browser.");
-    } else {
-      navigator.geolocation.getCurrentPosition(this.success, this.error);
-    }
+    window.document.body.appendChild(gMapScript);
+    gMapScript.addEventListener("load", () => {
+      this.initMap(this.fetchRestaurantsFromSearchByCuisines);
+    });
   }
 
   // Tom: data passed from SearchByCuisines component will be stored in "this.props.location.state"
-  fetchRestaurantsFromSearchByCuisines = () =>{
+  fetchRestaurantsFromSearchByCuisines = async () =>{
     if (this.props.location){
       const { selectedCities, selectedState, selectedCuisines } = this.props.location.state;
       console.log("data received 1: ", selectedCuisines);
       console.log("data received 2: ", selectedState);
       console.log("data received 3: ", selectedCities);
-      // TODO: fetch restaurants based on "selectedLocation" and "selectedCuisines"
+
+      let payload = {
+        selection: selectedCuisines
+      }
+
+      const response = await fetch("http://localhost:8081/cuisineInfo",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({data: payload})
+        }
+      );
+      const body = await response.json();
+      const data = body.data.map(row => {
+        return {
+          value: row.CUISINEID,
+          label: row.CUISINE
+        }
+      });
+
+      this.setState({ allCuisines: data, selectedCuisines: data }, () => {
+        if (selectedState === "Current Location") {
+          if (!navigator.geolocation) {
+            console.log("Geolocation isn't supported on your browser.");
+          } else {
+            navigator.geolocation.getCurrentPosition(this.success, this.error);
+          }
+        } else {
+          console.log("NOT IMPLEMENTED YET");
+        }
+      });
     }
   }
 
@@ -104,7 +167,7 @@ export default class Feature3 extends React.Component {
     return;
   }
 
-  initMap = () => {
+  initMap = (callback) => {
     let stylesArray = mapStyle;
     let mapType = "roadmap";
     let map = new window.google.maps.Map(this.googleMap.current, {
@@ -125,9 +188,11 @@ export default class Feature3 extends React.Component {
       },
       animation: window.google.maps.Animation.DROP,
       map: map
-    })
+    });
 
-    this.setState({ map: map, origin: origin, loading: false });
+    this.setState({ map: map, origin: origin }, () => {
+      callback();
+    });
   }
 
   updateMap = (data) => {
@@ -319,7 +384,7 @@ export default class Feature3 extends React.Component {
               value={this.state.radius}
               options={this.state.radii}
               onChange={this.handleRadiusSelect}
-              placeholder="Select Radius ... "
+              placeholder="Select Radius (Miles) ... "
             />
           </div>
 
@@ -327,7 +392,7 @@ export default class Feature3 extends React.Component {
             variant="primary"
             disabled={this.state.loading}
             onClick={this.handleClick}
-          >Search</Button>
+          >Update</Button>
 
         </div>
 
@@ -357,25 +422,8 @@ export default class Feature3 extends React.Component {
           </div>
           <div id="gmap" ref={this.googleMap}></div>
         </div>
-
-        <Modal show={this.state.show} onHide={this.handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Restaurants</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>This is a work in progress:
-            <br></br>
-            TEMP FILLER
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={this.handleClose}>
-              Close
-            </Button>
-            <Button variant="primary" onClick={this.handleClose}>
-              Save Changes
-            </Button>
-          </Modal.Footer>
-        </Modal>
-
+        {this.signOutModal()}
+        {this.userModal()}
       </div>
     );
   }
