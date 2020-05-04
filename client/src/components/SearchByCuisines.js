@@ -6,11 +6,15 @@ import { Link } from "react-router-dom";
 import '../style/SearchPage.css';
 import { TiHeartFullOutline, TiLocation } from "react-icons/ti";
 import { IconContext } from "react-icons";
+import { API, Auth } from 'aws-amplify'
 
 export default class SearchByCuisines extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+
+      userId: "",
+
       cuisineOptions: [
         { value: 'American', label: 'American' },
         { value: 'Chinese', label: 'Chinese' },
@@ -37,6 +41,7 @@ export default class SearchByCuisines extends React.Component {
       _selectedState: "",
       selectedCities: [],
       _selectedCities: [],
+      favoriteCuisines: [],
 
       //geo location
       lat: null,
@@ -51,6 +56,16 @@ export default class SearchByCuisines extends React.Component {
    */
   componentDidMount = async () => {
     // await this.getCuisineTypes();
+    await Auth.currentAuthenticatedUser()
+      //if logged in already
+      .then(async user => {
+        const userId = user.username;
+        this.setState({userId})
+      })
+      //if not logged in
+      .catch(err => {
+        console.log(err)
+      })
   }
   getCuisineTypes = async () => {
     await fetch("http://localhost:8081/cuisineTypes/",
@@ -213,6 +228,20 @@ export default class SearchByCuisines extends React.Component {
       _selectedCities: ['San Francisco'],
     })
   }
+  handleAddFavorites = async () =>{
+    const response = await API.get("cis550proj", `/users/${this.state.userId}`);
+    console.log("Response: ",response)
+    const favoriteCuisines = response[0].favoriteCuisines;
+    this.setState({favoriteCuisines});
+
+    let _selectedCuisines = [];
+    if (favoriteCuisines) {
+      favoriteCuisines.map((element) => {
+        _selectedCuisines.push(element.value);
+      })
+      this.setState({selectedCuisines: favoriteCuisines, _selectedCuisines});
+    }
+  }
 
   /**
    * Geo location handler 
@@ -240,7 +269,7 @@ export default class SearchByCuisines extends React.Component {
 
         <div className="rows">
           <IconContext.Provider value={{ style: { color: 'white', marginRight: '5' } }}>
-            <TiHeartFullOutline size={35} />
+            <TiHeartFullOutline size={35} onClick={this.handleAddFavorites}/>
           </IconContext.Provider>
           <Select
             isMulti
