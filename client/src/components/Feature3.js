@@ -1,13 +1,15 @@
 import React from 'react';
 import '../style/Feature3.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
 import Select from 'react-select';
-import PageNavbar from './PageNavbar';
+// import PageNavbar from './PageNavbar';
 import mapStyle from './MapStyle';
 // import Map from './Map';
 // import RestaurantCard from './RestaurantCard';
+import UserPage from './UserPage';
+import { Button, Navbar, Nav, Modal, Spinner } from 'react-bootstrap';
+import { Auth } from 'aws-amplify';
+import { FaSearch, FaHome, FaUserAlt, FaSignOutAlt } from 'react-icons/fa';
 
 export default class Feature3 extends React.Component {
 
@@ -58,7 +60,7 @@ export default class Feature3 extends React.Component {
   componentDidMount = async () => {
     this.fetchRestaurantsFromSearchByCuisines(); //Tom: handle data from SearchByCuisines component
 
-    await this.fetchCuisines();
+    // await this.fetchCuisines();
 
     if (!navigator.geolocation) {
       console.log("Geolocation isn't supported on your browser.");
@@ -231,10 +233,70 @@ export default class Feature3 extends React.Component {
     // this.handleShow();
   }
 
+  /**
+   * User Modal
+   */
+  userModal = () =>{
+    return (
+      <Modal show={this.state.showUser} onHide={this.handleCloseUserModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>User</Modal.Title>
+        </Modal.Header>
+        <UserPage/>
+      </Modal>
+    )
+  }
+  signOutModal = () =>{
+    return (
+      <Modal show={this.state.showSignOut} onHide={this.handleCloseSignOutModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Signed out!</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Redirecting to main page . . . <Spinner animation="border" /> </Modal.Body>
+      </Modal>
+    )
+  }
+  handleShowUserModal = () =>{
+    this.setState({ showUser: true });
+  }
+  handleCloseUserModal = () =>{
+    this.setState({ showUser: false });
+  }
+  handleShowSignOutModal = () =>{
+    this.setState({ showSignOut: true });
+  }
+  handleCloseSignOutModal = () =>{
+    this.setState({ showSignOut: false });
+  }
+  handleLogOut = async () =>{
+    try {
+      await Auth.signOut();
+      this.handleShowSignOutModal();
+      setTimeout(this.navigateToMain, 2000);
+    } catch (error) {
+      console.log('error signing out: ', error);
+    }
+  }
+
   render() {
     return (
       <div className="Feature3">
-        <PageNavbar active="Feature3" />
+        <div id="navWrapper">
+          <div className="navBar">
+            <Navbar bg="transparent" >
+              <Navbar.Brand href="/Main" >
+                <FaHome />
+              </Navbar.Brand>
+              <Nav className="mr-auto"> </Nav>
+              <Navbar.Brand onClick={this.handleShowUserModal} >
+                <FaUserAlt />
+              </Navbar.Brand>
+              <Navbar.Brand onClick={this.handleLogOut} >
+                <FaSignOutAlt />
+              </Navbar.Brand>
+            </Navbar>
+          </div>
+        </div>
         { this.state.loading &&
         <div id="loader">
           <div className="spinner"></div>

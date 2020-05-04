@@ -5,6 +5,12 @@ html, body, #gmap {
 	margin: 0;
 }
 
+#navWrapper {
+	position: absolute;
+	top: 0;
+	width: 100%;
+}
+
 .selectSection {
 	height: 20vh;
 	display: flex;
