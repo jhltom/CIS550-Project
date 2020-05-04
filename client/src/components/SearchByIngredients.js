@@ -9,6 +9,7 @@ import { Checkbox } from 'semantic-ui-react'
 import { Link } from "react-router-dom";
 import { TiHeartFullOutline, TiLocation } from "react-icons/ti";
 import { IconContext } from "react-icons";
+import { API, Auth } from 'aws-amplify'
 
 export default class SearchByIngredients extends React.Component {
   constructor(props) {
@@ -45,14 +46,27 @@ export default class SearchByIngredients extends React.Component {
       selectedState: null,
       _selectedState: "",
       selectedCities: [],
-      _selectedCities: []
+      _selectedCities: [],
+      _selectedCuisines: [],
+      lat: null,
+      lng: null,
+      loading: false
       
     }
   }
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
 
-    this.getFreq();
+    await Auth.currentAuthenticatedUser()
+      //if logged in already
+      .then(async user => {
+        const userId = user.username;
+        this.setState({userId})
+      })
+      //if not logged in
+      .catch(err => {
+        console.log(err)
+      })
 
   }
 
@@ -182,6 +196,7 @@ export default class SearchByIngredients extends React.Component {
       }, err => {
         console.warn(err);
       }).then(async result => {
+
         console.log('matched cuisines', result.rows);
         let matchedCuisines = result.rows.map((cuisine, i) => {
           return (
@@ -192,6 +207,13 @@ export default class SearchByIngredients extends React.Component {
           )
         });
         this.setState({ matchedCuisines: matchedCuisines });
+
+        let _selectedCuisines = [];
+        result.rows.map((cuisine ) => {
+          _selectedCuisines.push(cuisine[0]);
+        });
+        this.setState({ _selectedCuisines: _selectedCuisines });
+
       }, err => {
         console.warn(err);
       });
@@ -281,6 +303,11 @@ handleCurrentLocation = () => {
     selectedCities: [{ value: 'Current Location', label: 'Current Location' }],
     _selectedCities: ['Current Location'],
   })
+  if (!navigator.geolocation) {
+    console.log("Geolocation isn't supported on your browser.");
+  } else {
+    navigator.geolocation.getCurrentPosition(this.success, this.error);
+  }
 }
 handleLosAngeles = () => {
   this.setState({
@@ -341,6 +368,19 @@ handleSanFrancisco = () => {
     selectedCities: [{ value: 'San Francisco', label: 'San Francisco' }],
     _selectedCities: ['San Francisco'],
   })
+}
+
+success = position => {
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
+
+  this.setState({ lat: latitude, lng: longitude, loading: false });
+  console.log("latitude: ", latitude);
+  console.log("latitude: ", longitude);
+}
+
+error = () => {
+  console.log("Could not geolocate this browser.");
 }
 
   render() {
@@ -471,7 +511,9 @@ handleSanFrancisco = () => {
               state: {// place data you want to send here!
                 selectedCities: this.state._selectedCities,
                 selectedState: this.state._selectedState,
-                selectedCuisines: this.state.matchedCuisines,
+                selectedCuisines: this.state._selectedCuisines,
+                lat: this.state.lat,
+                lng: this.state.lng,
               }
             }}><Button type="submit" disabled={!this.validateSearch()} > See Restaurants </Button>
           </Link>
