@@ -21,6 +21,8 @@ export default class Feature3 extends React.Component {
       origin: null,
       loading: true,
       selectedCuisines: [],
+      selectedCities: [],
+      selectedState: null,
       allCuisines: [],
       radius: { value: 2, label: '2' },
       radii: [
@@ -30,8 +32,67 @@ export default class Feature3 extends React.Component {
         { value: 4, label: '4' },
         { value: 5, label: '5' },
       ],
-      show: false,
       restaurants: [],
+      useLocation: false,
+    }
+  }
+
+  componentDidMount = async () => {
+    const gMapScript = document.createElement("script");
+    gMapScript.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_MAPS_API_KEY}`;
+
+    window.document.body.appendChild(gMapScript);
+    gMapScript.addEventListener("load", () => {
+      this.initMap(this.fetchRestaurantsFromSearchByCuisines);
+    });
+  }
+
+  // Tom: data passed from SearchByCuisines component will be stored in "this.props.location.state"
+  fetchRestaurantsFromSearchByCuisines = async () =>{
+    if (this.props.location){
+      const { selectedCities, selectedState, selectedCuisines } = this.props.location.state;
+      console.log("data received 1: ", selectedCuisines);
+      console.log("data received 2: ", selectedState);
+      console.log("data received 3: ", selectedCities);
+
+      let payload = {
+        selection: selectedCuisines
+      }
+
+      const response = await fetch("http://localhost:8081/cuisineInfo",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({data: payload})
+        }
+      );
+      const body = await response.json();
+      const data = body.data.map(row => {
+        return {
+          value: row.CUISINEID,
+          label: row.CUISINE
+        }
+      });
+
+      this.setState(
+        { allCuisines: data,
+          selectedCuisines: data,
+          selectedState: selectedState,
+          selectedCities: selectedCities,
+          useLocation: selectedState === "Current Location"
+        }, () => {
+        if (selectedState === "Current Location") {
+          if (!navigator.geolocation) {
+            console.log("Geolocation isn't supported on your browser.");
+          } else {
+            navigator.geolocation.getCurrentPosition(this.success, this.error);
+          }
+        } else {
+          this.regularSearch();
+        }
+      });
     }
   }
 
@@ -87,57 +148,64 @@ export default class Feature3 extends React.Component {
     console.log("Could not geolocate this browser.");
   }
 
-  componentDidMount = async () => {
-    const gMapScript = document.createElement("script");
-    gMapScript.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_MAPS_API_KEY}`;
-
-    window.document.body.appendChild(gMapScript);
-    gMapScript.addEventListener("load", () => {
-      this.initMap(this.fetchRestaurantsFromSearchByCuisines);
+  regularSearch = async () => {
+    let selection = this.state.selectedCuisines.map(cuisine => {
+      return cuisine.value;
     });
-  }
-
-  // Tom: data passed from SearchByCuisines component will be stored in "this.props.location.state"
-  fetchRestaurantsFromSearchByCuisines = async () =>{
-    if (this.props.location){
-      const { selectedCities, selectedState, selectedCuisines } = this.props.location.state;
-      console.log("data received 1: ", selectedCuisines);
-      console.log("data received 2: ", selectedState);
-      console.log("data received 3: ", selectedCities);
-
-      let payload = {
-        selection: selectedCuisines
-      }
-
-      const response = await fetch("http://localhost:8081/cuisineInfo",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({data: payload})
-        }
-      );
-      const body = await response.json();
-      const data = body.data.map(row => {
-        return {
-          value: row.CUISINEID,
-          label: row.CUISINE
-        }
-      });
-
-      this.setState({ allCuisines: data, selectedCuisines: data }, () => {
-        if (selectedState === "Current Location") {
-          if (!navigator.geolocation) {
-            console.log("Geolocation isn't supported on your browser.");
-          } else {
-            navigator.geolocation.getCurrentPosition(this.success, this.error);
-          }
-        } else {
-          console.log("NOT IMPLEMENTED YET");
-        }
-      });
+    let payload1 = {
+      selection: selection,
+      state: this.state.selectedState,
+      cities: this.state.selectedCities
     }
+
+    const response_r = await fetch("http://localhost:8081/restaurantConditions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({data: payload1})
+      }
+    );
+    const body_r = await response_r.json();
+
+    let preHours = body_r.data;
+    let returnedIds = preHours.map(function(r) {
+      return r.ID;
+    });
+
+    let payload2 = {
+      selection: returnedIds
+    }
+
+    const response_h = await fetch("http://localhost:8081/restaurantHours",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({data: payload2})
+      }
+    );
+    const body_h = await response_h.json();
+
+    let hourMap = new Map();
+
+    body_h.data.forEach(function(h) {
+      let info = hourMap.get(h.BUSINESSID);
+      info = info ? info : [];
+      info.push(h);
+      hourMap.set(h.BUSINESSID, info);
+    });
+
+    preHours.forEach(function(r) {
+      let info = hourMap.get(r.ID);
+      info = info ? info : [];
+      r.hours = info;
+    });
+
+    this.setState({ loading: false, restaurants: preHours });
+    this.updateMap(preHours);
   }
 
   initMap = (callback) => {
@@ -150,8 +218,6 @@ export default class Feature3 extends React.Component {
         lng: this.state.lng
       },
       disableDefaultUI: true,
-      gestureHandling: 'none',
-      zoomControl: false,
       mapTypeId: mapType,
       styles: stylesArray
     });
@@ -256,6 +322,7 @@ export default class Feature3 extends React.Component {
       }
     );
     const body = await response.json();
+    console.log(body.data)
     this.setState({ loading: false, restaurants: body.data });
     this.updateMap(body.data);
   }
@@ -347,12 +414,13 @@ export default class Feature3 extends React.Component {
               options={this.state.radii}
               onChange={this.handleRadiusSelect}
               placeholder="Select Radius (Miles) ... "
+              isDisabled={!this.state.useLocation}
             />
           </div>
 
           <Button
             variant="primary"
-            disabled={this.state.loading}
+            disabled={this.state.loading || !this.state.useLocation}
             onClick={this.handleClick}
           >Update</Button>
 

@@ -477,7 +477,7 @@ async function getAllCuisineTypesFull(req, res) {
 	}
 }
 
-/* ---- (cuisine types) ---- */
+/* ---- (cuisine info) ---- */
 async function getSelectedCuisineInfo(req, res) {
 	const data = req.body.data;
 	const selectedIds = data.selection;
@@ -503,6 +503,84 @@ async function getSelectedCuisineInfo(req, res) {
 		}
 	}
 }
+
+/* ---- (restaurants with given conditions) ---- */
+async function getRestaurantsWithConditions(req, res) {
+	const data = req.body.data;
+	const selectedIds = data.selection;
+	const selectedState = data.state;
+	const selectedCities = data.cities.map(function(city) {
+		return `'${city}'`;
+	});
+
+	const query = `
+		WITH candidates AS (
+			SELECT businessId AS id,
+			LISTAGG(cuisineId) WITHIN GROUP (ORDER BY cuisineId) AS cuisineIds
+			FROM Serve
+			WHERE cuisineId IN(${selectedIds.join(",")})
+			GROUP BY businessId
+		), local AS (
+			SELECT businessId AS id
+			FROM Restaurants
+			WHERE businessId IN(SELECT id FROM candidates)
+			AND state = '${selectedState}'
+			AND city IN(${selectedCities.join(",")})
+		) SELECT * FROM (
+			SELECT * FROM candidates WHERE id IN (
+				SELECT id FROM local
+			)
+		) c JOIN Restaurants r ON c.id = r.businessId
+		WHERE businessId IN(SELECT id FROM local)
+	`;
+	let connection;
+
+	try {
+		let pool = await getPool();
+		connection = await pool.getConnection();
+		let result = await connection.execute(query);
+		result = formatResult(result);
+		res.json(result);
+	} catch (e) {
+		console.log(e);
+	} finally {
+		if (connection) {
+			try {
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+}
+
+/* ---- (restaurants hours) ---- */
+async function getRestaurantHours(req, res) {
+	const data = req.body.data;
+	const selectedIds = data.selection;
+
+	const query = `SELECT * FROM OpenHours WHERE businessId IN(${selectedIds.join(",")})`;
+	let connection;
+
+	try {
+		let pool = await getPool();
+		connection = await pool.getConnection();
+		let result = await connection.execute(query);
+		result = formatResult(result);
+		res.json(result);
+	} catch (e) {
+		console.log(e);
+	} finally {
+		if (connection) {
+			try {
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+}
+
 
 /* ---- (restaurants with given cuisine) ---- */
 async function getRestaurantsWithCuisine(req, res) {
@@ -790,4 +868,6 @@ module.exports = {
 	getCuisinesMinusIngredients: getCuisinesMinusIngredients,
 	getCitiesFromState : getCitiesFromState,
 	getSelectedCuisineInfo: getSelectedCuisineInfo,
+	getRestaurantsWithConditions: getRestaurantsWithConditions,
+	getRestaurantHours: getRestaurantHours,
 }
