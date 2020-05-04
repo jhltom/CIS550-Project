@@ -2,10 +2,7 @@ import React from 'react';
 import '../style/Feature3.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Select from 'react-select';
-// import PageNavbar from './PageNavbar';
 import mapStyle from './MapStyle';
-// import Map from './Map';
-// import RestaurantCard from './RestaurantCard';
 import UserPage from './UserPage';
 import { Button, Navbar, Nav, Modal, Spinner } from 'react-bootstrap';
 import { Auth } from 'aws-amplify';
@@ -63,7 +60,7 @@ export default class Feature3 extends React.Component {
     let data = {
       lat: latitude,
       lng: longitude,
-      radius: 3,
+      radius: 2,
       selection: selection
     }
 
@@ -143,30 +140,6 @@ export default class Feature3 extends React.Component {
     }
   }
 
-  fetchCuisines = async () => {
-    const response = await fetch("http://localhost:8081/cuisineTypesFull",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
-    );
-    const body = await response.json();
-
-    const data = body.data.map(row => {
-      return {
-        value: row.CUISINEID,
-        label: row.CUISINE
-      }
-    });
-
-    // const data = [{ value: 9, label: "Korean"}];
-
-    this.setState({ allCuisines: data });
-    return;
-  }
-
   initMap = (callback) => {
     let stylesArray = mapStyle;
     let mapType = "roadmap";
@@ -208,7 +181,7 @@ export default class Feature3 extends React.Component {
 
     let map = this.state.map;
     let bounds = new window.google.maps.LatLngBounds();
-    let labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    // let labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
     // Create markers and expand map bounds
     data.forEach((item, idx) => {
@@ -245,15 +218,6 @@ export default class Feature3 extends React.Component {
     });
   }
 
-  markerToggle = idx => {
-    // let marker = this.markers[idx];
-    // if (marker.getAnimation() !== null) {
-    //   marker.setAnimation(null);
-    // } else {
-    //   marker.setAnimation(window.google.maps.Animation.BOUNCE);
-    // }
-  }
-
   markerBounce = idx => {
     this.markers[idx].setAnimation(window.google.maps.Animation.BOUNCE);
   }
@@ -269,9 +233,6 @@ export default class Feature3 extends React.Component {
   handleRadiusSelect = async selectedRadius => {
     this.setState({ radius: selectedRadius });
   }
-
-  handleShow = async () => this.setState({ show: true });
-  handleClose = async () => this.setState({ show: false });
 
   handleClick = async () => {
     this.setState({ loading: true });
@@ -297,7 +258,6 @@ export default class Feature3 extends React.Component {
     const body = await response.json();
     this.setState({ loading: false, restaurants: body.data });
     this.updateMap(body.data);
-    // this.handleShow();
   }
 
   /**
@@ -407,7 +367,6 @@ export default class Feature3 extends React.Component {
             <div 
               className="restaurant"
               key={`restaurant-${restaurant.ID}`}
-              onClick={() => this.markerToggle(idx)}
               onMouseEnter={() => this.markerBounce(idx)}
               onMouseLeave={() => this.markerStop(idx)}
             >
