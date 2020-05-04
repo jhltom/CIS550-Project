@@ -5,7 +5,7 @@ import Select from 'react-select';
 import mapStyle from './MapStyle';
 import UserPage from './UserPage';
 import { Button, Navbar, Nav, Modal, Spinner } from 'react-bootstrap';
-import { Auth } from 'aws-amplify';
+import { Auth, API } from 'aws-amplify';
 import { FaSearch, FaHome, FaUserAlt, FaSignOutAlt } from 'react-icons/fa';
 
 export default class Feature3 extends React.Component {
@@ -47,6 +47,35 @@ export default class Feature3 extends React.Component {
     gMapScript.addEventListener("load", () => {
       this.initMap(this.fetchRestaurantsFromSearchByCuisines);
     });
+  }
+
+  addToFavorite = async (restaurant) =>{
+    alert("Restaurant added!")
+    Auth.currentAuthenticatedUser()
+      //if logged in already
+      .then(async user => {
+        const userId = user.username;
+        const response = await API.get("cis550proj", `/users/${userId}`);
+        const firstName = response[0].firstName;
+        const lastName = response[0].lastName;
+        const favoriteCuisines = response[0].favoriteCuisines;
+        let favoriteRestaurants = response[0].favoriteRestaurants;
+        favoriteRestaurants.push(restaurant);
+        await API.put("cis550proj", "/users", {
+          body: {
+            id: userId,
+            firstName: firstName,
+            lastName: lastName,
+            favoriteCuisines: favoriteCuisines,
+            favoriteRestaurants: favoriteRestaurants
+          }
+        });
+      })
+      //if not logged in
+      .catch(err => {
+        console.log(err)
+        this.setState({ userLogged: false });
+      })
   }
 
   // Tom: data passed from SearchByCuisines component will be stored in "this.props.location.state"
@@ -128,30 +157,68 @@ export default class Feature3 extends React.Component {
     let selection = this.state.selectedCuisines.map(cuisine => {
       return cuisine.value;
     });
-    let data = {
+
+    let payload1 = {
       lat: latitude,
       lng: longitude,
       radius: 2,
       selection: selection
     }
 
-    const response = await fetch("http://localhost:8081/restaurantsNearby",
+    const response_r = await fetch("http://localhost:8081/restaurantsNearby",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({data: data})
+        body: JSON.stringify({data: payload1})
       }
     );
-    const body = await response.json();
+    const body_r = await response_r.json();
+
+    let preHours = body_r.data;
+    let returnedIds = preHours.map(function(r) {
+      return r.ID;
+    });
+
+    let payload2 = {
+      selection: returnedIds
+    }
+
+    const response_h = await fetch("http://localhost:8081/restaurantHours",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({data: payload2})
+      }
+    );
+    const body_h = await response_h.json();
+
+    let hourMap = new Map();
+
+    body_h.data.forEach(function(h) {
+      let info = hourMap.get(h.BUSINESSID);
+      info = info ? info : [];
+      info.push(h);
+      hourMap.set(h.BUSINESSID, info);
+    });
+
+    preHours.forEach(function(r) {
+      let info = hourMap.get(r.ID);
+      info = info ? info : [];
+      r.hours = info;
+    });
+
     this.setState({ lat: latitude,
                     lng: longitude,
                     loading: false,
-                    restaurants: body.data,
+                    restaurants: preHours,
+                    unfiltered: preHours,
                     origin: updateOrigin
                   });
-    this.updateMap(body.data);
+    this.updateMap(preHours);
   }
 
   error = () => {
@@ -394,28 +461,66 @@ export default class Feature3 extends React.Component {
 
   handleClick = async () => {
     this.setState({ loading: true });
+
     let selection = this.state.selectedCuisines.map(cuisine => {
       return cuisine.value;
     });
-    let data = {
+
+    let payload1 = {
       lat: this.state.lat,
       lng: this.state.lng,
       radius: this.state.radius.value,
       selection: selection
     }
 
-    const response = await fetch("http://localhost:8081/restaurantsNearby",
+    const response_r = await fetch("http://localhost:8081/restaurantsNearby",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({data: data})
+        body: JSON.stringify({data: payload1})
       }
     );
-    const body = await response.json();
-    this.setState({ loading: false, restaurants: body.data });
-    this.updateMap(body.data);
+    const body_r = await response_r.json();
+
+    let preHours = body_r.data;
+    let returnedIds = preHours.map(function(r) {
+      return r.ID;
+    });
+
+    let payload2 = {
+      selection: returnedIds
+    }
+
+    const response_h = await fetch("http://localhost:8081/restaurantHours",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({data: payload2})
+      }
+    );
+    const body_h = await response_h.json();
+
+    let hourMap = new Map();
+
+    body_h.data.forEach(function(h) {
+      let info = hourMap.get(h.BUSINESSID);
+      info = info ? info : [];
+      info.push(h);
+      hourMap.set(h.BUSINESSID, info);
+    });
+
+    preHours.forEach(function(r) {
+      let info = hourMap.get(r.ID);
+      info = info ? info : [];
+      r.hours = info;
+    });
+
+    this.setState({ loading: false, restaurants: preHours, unfiltered: preHours });
+    this.updateMap(preHours);
   }
 
   /**
@@ -513,6 +618,7 @@ export default class Feature3 extends React.Component {
                 isMulti
                 isSearchable
                 placeholder="Select City(s) ... "
+                isDisabled={this.state.useLocation}
               />
             </div>
             <div className="selectItem">
@@ -553,6 +659,7 @@ export default class Feature3 extends React.Component {
                 <h3>{restaurant.NAME}</h3>
                 <p>{restaurant.ADDRESS}</p>
                 <p>Rating: {restaurant.STARS}</p>
+                <Button variant="link" onClick={() => this.addToFavorite(restaurant)}>Add to favorites</Button>
               </div>
             </div>
           ))}
