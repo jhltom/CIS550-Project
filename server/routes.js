@@ -700,22 +700,24 @@ async function getNearbyRestaurants(req, res) {
 	if (selectedIds.length) {
 		query = `
 			WITH filtered AS (
-				SELECT businessId as id
+				SELECT businessId AS id,
+				LISTAGG(cuisineId) WITHIN GROUP (ORDER BY cuisineId) AS cuisineIds
 				FROM Serve
 				WHERE cuisineId IN(${selectedIds.join(",")})
+				GROUP BY businessId
 			), dist AS (
 				SELECT businessId AS id, name, address, latitude,
 				longitude, stars, reviewcount,
 				(3959 * ACOS(COS(${userLat} * 0.01745329251) * COS(latitude * 0.01745329251) * COS((longitude - ${userLng}) * 0.01745329251) + SIN(${userLat} * 0.01745329251) * SIN(latitude * 0.01745329251))) AS distance
 				FROM Restaurants
 				WHERE businessId IN (
-					SELECT *
+					SELECT id
 					FROM filtered
 				)
-			) SELECT id, name, address, latitude, longitude, stars, reviewcount, distance
-			FROM dist
-			WHERE distance <= ${radius}
-			ORDER BY distance
+			), semifinal AS (
+				SELECT * FROM dist WHERE distance <= ${radius}
+			) SELECT * FROM semifinal s JOIN filtered f ON s.id = f.id
+			ORDER BY s.distance
 		`;
 	} else {
 		query = `
@@ -724,10 +726,18 @@ async function getNearbyRestaurants(req, res) {
 				longitude, stars, reviewcount,
 				(3959 * ACOS(COS(${userLat} * 0.01745329251) * COS(latitude * 0.01745329251) * COS((longitude - ${userLng}) * 0.01745329251) + SIN(${userLat} * 0.01745329251) * SIN(latitude * 0.01745329251))) AS distance
 				FROM Restaurants
-			) SELECT id, name, address, latitude, longitude, stars, reviewcount, distance
-			FROM dist
-			WHERE distance <= ${radius}
-			ORDER BY distance
+			), withCuisines AS (
+				SELECT businessId AS id,
+				LISTAGG(cuisineId) WITHIN GROUP (ORDER BY cuisineId) AS cuisineIds
+				FROM Serve
+				WHERE businessId IN(
+					SELECT id FROM dist
+				)
+				GROUP BY businessId
+			), semifinal AS (
+				SELECT * FROM dist WHERE distance <= ${radius}
+			) SELECT * FROM semifinal s JOIN withCuisines w ON s.id = w.id
+			ORDER BY s.distance
 		`;
 	}
 
