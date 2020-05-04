@@ -1,6 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Button, DropdownButton, Dropdown} from 'react-bootstrap';
+import { Button, DropdownButton, Dropdown, Spinner, Form, Modal} from 'react-bootstrap';
 import Select from 'react-select';
 import '../style/SearchPage.css';
 import ReactSearchBox from 'react-search-box'
@@ -491,18 +491,10 @@ error = () => {
           <br></br>
           <br></br>
           <br></br>
-          <br></br>          
           <br></br>
           <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
+
+
 
 
 
