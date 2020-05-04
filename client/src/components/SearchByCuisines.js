@@ -36,7 +36,12 @@ export default class SearchByCuisines extends React.Component {
       selectedState: null,
       _selectedState: "",
       selectedCities: [],
-      _selectedCities: []
+      _selectedCities: [],
+
+      //geo location
+      lat: null,
+      lng: null,
+      loading: false
 
     }
   }
@@ -142,6 +147,11 @@ export default class SearchByCuisines extends React.Component {
       selectedCities: [{ value: 'Current Location', label: 'Current Location' }],
       _selectedCities: ['Current Location'],
     })
+    if (!navigator.geolocation) {
+      console.log("Geolocation isn't supported on your browser.");
+    } else {
+      navigator.geolocation.getCurrentPosition(this.success, this.error);
+    }
   }
   handleLosAngeles = () => {
     this.setState({
@@ -202,6 +212,22 @@ export default class SearchByCuisines extends React.Component {
       selectedCities: [{ value: 'San Francisco', label: 'San Francisco' }],
       _selectedCities: ['San Francisco'],
     })
+  }
+
+  /**
+   * Geo location handler 
+   */
+  success = position => {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+    this.setState({ lat: latitude, lng: longitude, loading: false });
+    console.log("latitude: ", latitude);
+    console.log("latitude: ", longitude);
+  }
+
+  error = () => {
+    console.log("Could not geolocate this browser.");
   }
 
   /**
