@@ -177,6 +177,8 @@ export default class Feature3 extends React.Component {
         lng: this.state.lng
       },
       disableDefaultUI: true,
+      gestureHandling: 'none',
+      zoomControl: false,
       mapTypeId: mapType,
       styles: stylesArray
     });
