@@ -5,18 +5,20 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Select from 'react-select';
 import PageNavbar from './PageNavbar';
-import Map from './Map';
-import RestaurantCard from './RestaurantCard';
+import mapStyle from './MapStyle';
+// import Map from './Map';
+// import RestaurantCard from './RestaurantCard';
 
 export default class Feature3 extends React.Component {
 
   constructor(props) {
     super(props);
-
+    this.googleMap = React.createRef();
+    this.markers = [];
     this.state = {
       map: null,
-      lat: null,
-      lng: null,
+      lat: 0,
+      lng: 0,
       origin: null,
       loading: true,
       selectedCuisines: [],
@@ -30,17 +32,23 @@ export default class Feature3 extends React.Component {
         { value: 5, label: '5' },
       ],
       show: false,
-      restaurants: []
+      restaurants: [],
     }
   }
-
-  googleMap = React.createRef();
 
   success = position => {
     const latitude = position.coords.latitude;
     const longitude = position.coords.longitude;
 
     this.setState({ lat: latitude, lng: longitude, loading: false });
+    
+    const gMapScript = document.createElement("script");
+    gMapScript.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_MAPS_API_KEY}`;
+
+    window.document.body.appendChild(gMapScript);
+    gMapScript.addEventListener("load", () => {
+      this.initMap();
+    });
   }
 
   error = () => {
@@ -94,6 +102,97 @@ export default class Feature3 extends React.Component {
     return;
   }
 
+  initMap = () => {
+    let stylesArray = mapStyle;
+    let mapType = "roadmap";
+    let map = new window.google.maps.Map(this.googleMap.current, {
+      zoom: 15,
+      center: {
+        lat: this.state.lat,
+        lng: this.state.lng
+      },
+      disableDefaultUI: true,
+      mapTypeId: mapType,
+      styles: stylesArray
+    });
+
+    let origin = new window.google.maps.Marker({
+      position: {
+        lat: this.state.lat,
+        lng: this.state.lng
+      },
+      animation: window.google.maps.Animation.DROP,
+      map: map
+    })
+
+    this.setState({ map: map, origin: origin, loading: false });
+  }
+
+  updateMap = (data) => {
+    // Delete existing markers
+    if (this.markers.length) {
+      this.markers.forEach(function(marker) {
+        marker.setMap(null);
+      });
+      this.markers = [];
+    }
+
+    let map = this.state.map;
+    let bounds = new window.google.maps.LatLngBounds();
+    let labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+    // Create markers and expand map bounds
+    data.forEach((item, idx) => {
+      let loc = new window.google.maps.LatLng(item.LATITUDE, item.LONGITUDE);
+      bounds.extend(loc);
+
+      let marker = new window.google.maps.Marker({
+        position: {
+          lat: item.LATITUDE,
+          lng: item.LONGITUDE
+        },
+        animation: window.google.maps.Animation.DROP,
+        // label: labels[idx % labels.length],
+        icon: {
+          url: "/marker.png",
+          scaledSize: new window.google.maps.Size(30, 30)
+        }
+      });
+      // marker.addListener('click', () => {
+      //   console.log(item);
+      // });
+      this.markers.push(marker);
+    });
+
+    // Adjust map bounds
+    map.fitBounds(bounds);
+    map.panToBounds(bounds);
+
+    // Place markers
+    this.markers.forEach((marker, idx) => {
+      window.setTimeout(() => {
+        marker.setMap(map);
+      }, idx * 100);
+    });
+  }
+
+  markerToggle = idx => {
+    // let marker = this.markers[idx];
+    // if (marker.getAnimation() !== null) {
+    //   marker.setAnimation(null);
+    // } else {
+    //   marker.setAnimation(window.google.maps.Animation.BOUNCE);
+    // }
+  }
+
+  markerBounce = idx => {
+    this.markers[idx].setAnimation(window.google.maps.Animation.BOUNCE);
+  }
+
+  markerStop = idx => {
+    this.markers[idx].setAnimation(null);
+  }
+
   handleCuisineSelect = async selectedCuisine => {
     this.setState({ selectedCuisines: selectedCuisine });
   }
@@ -127,8 +226,9 @@ export default class Feature3 extends React.Component {
       }
     );
     const body = await response.json();
-    this.setState({ loading: false, restaurants: body.rows });
-    this.handleShow();
+    this.setState({ loading: false, restaurants: body.data });
+    this.updateMap(body.data);
+    // this.handleShow();
   }
 
   render() {
@@ -174,15 +274,26 @@ export default class Feature3 extends React.Component {
           {this.state.restaurants.length === 0 &&
             <div className="noResults">No results to show</div>
           }
-          {this.state.restaurants.map((restaurant) => (
-            <RestaurantCard restaurant={restaurant} />
+          {this.state.restaurants.map((restaurant, idx) => (
+            <div 
+              className="restaurant"
+              key={`restaurant-${restaurant.ID}`}
+              onClick={() => this.markerToggle(idx)}
+              onMouseEnter={() => this.markerBounce(idx)}
+              onMouseLeave={() => this.markerStop(idx)}
+            >
+              <div className="thumb">
+                <img src="/marker.png" />
+              </div>
+              <div className="content">
+                <h3>{restaurant.NAME}</h3>
+                <p>{restaurant.ADDRESS}</p>
+                <p>Rating: {restaurant.STARS}</p>
+              </div>
+            </div>
           ))}
           </div>
-          <div id="gmap" ref={this.googleMap}>
-          { !this.state.loading &&
-            <Map lat={this.state.lat} lng={this.state.lng}/>
-          }
-          </div>
+          <div id="gmap" ref={this.googleMap}></div>
         </div>
 
         <Modal show={this.state.show} onHide={this.handleClose}>
@@ -191,7 +302,7 @@ export default class Feature3 extends React.Component {
           </Modal.Header>
           <Modal.Body>This is a work in progress:
             <br></br>
-            {this.state.restaurants}
+            TEMP FILLER
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={this.handleClose}>
