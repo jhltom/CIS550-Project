@@ -26,6 +26,9 @@ app.post('/matchedCuisines', routes.getMatchedCuisine);
 /* ---- (freq) ---- */
 app.get('/freq', routes.getFreq);
 
+/* ---- (cuisine id) ---- */
+app.get('/cuisineId', routes.getCuisineId);
+
 /* ---- (cuisine types) ---- */
 app.get('/cuisineTypes', routes.getAllCuisineTypes);
 

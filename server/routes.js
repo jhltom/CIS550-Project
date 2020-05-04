@@ -265,20 +265,31 @@ async function getMatchedCuisine(req, res) {
 	console.log('length:', selectedIngredients.length);
 	if(selectedIngredients.length){
 		query = `
-		select * From
+		WITH temp AS(
+			select * From
 			(SELECT DISTINCT d.cuisine AS cuisine, COUNT(d.dishid) as freq
 			FROM Dishes d
 			WHERE (${subquery})
 			GROUP BY d.cuisine
 			ORDER BY freq DESC)
+		)
+		SELECT t.cuisine, t.freq, c.cuisineid
+		FROM temp t JOIN cuisinetype c ON t.cuisine = c.cuisine
+		ORDER BY freq DESC
+		
 	`;
 	}
 	else{
 		query = `
-		SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
-		FROM Dishes d
-		GROUP BY d.cuisine
-		ORDER BY freq DESC	
+		WITH temp AS(
+			SELECT DISTINCT d.cuisine, COUNT(d.dishid) as freq
+			FROM Dishes d
+			GROUP BY d.cuisine
+			ORDER BY freq DESC	
+		)		
+		SELECT t.cuisine, t.freq, c.cuisineid
+		FROM temp t JOIN cuisinetype c ON t.cuisine = c.cuisine
+		ORDER BY freq DESC
 	`;
 	}
 	console.log(query);
@@ -331,6 +342,51 @@ async function getMatchedCuisine(req, res) {
 
 /* ---- (ingredients) ---- */
 async function getFreq(req, res) {
+	// Define query here
+	const query = `
+		SELECT Distinct d.cuisine, COUNT(*) AS freq
+		FROM Dishes d
+		GROUP BY d.cuisine
+		ORDER BY freq DESC
+	`;
+
+	// Keep connection in wider scope
+	let connection;
+
+	try {
+		// Get connection pool
+		let pool = await getPool();
+
+		// Obtain single connection from pool
+		connection = await pool.getConnection();
+
+		// Query the db
+		let result = await connection.execute(query);
+
+		// Send response
+		console.log("Result: ", result);
+		res.json(result);
+
+	} catch (e) {
+		console.log(e);
+
+	} finally {
+		if (connection) {
+			try {
+				// Close connection and return it to the pool
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+}
+
+/* ---- (cuisine id) ---- */
+async function getCuisineId(req, res) {
+
+	const _selectedCuisines = req.body.data._selectedCuisines;
+
 	// Define query here
 	const query = `
 		SELECT Distinct d.cuisine, COUNT(*) AS freq
@@ -725,6 +781,7 @@ module.exports = {
 	getAllCuisines: getAllCuisines,
 	getMatchedCuisine: getMatchedCuisine,
 	getFreq: getFreq,
+	getCuisineId: getCuisineId,
 	getAllCuisineTypes: getAllCuisineTypes,
 	getAllCuisineTypesFull: getAllCuisineTypesFull,
 	getRestaurantsWithCuisine: getRestaurantsWithCuisine,

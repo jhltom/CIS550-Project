@@ -50,6 +50,7 @@ export default class SearchByIngredients extends React.Component {
       selectedCities: [],
       _selectedCities: [],
       _selectedCuisines: [],
+      _selectedCuisineId: [],
       lat: null,
       lng: null,
       loading: false
@@ -217,6 +218,12 @@ export default class SearchByIngredients extends React.Component {
         });
         this.setState({ _selectedCuisines: _selectedCuisines });
 
+        let _selectedCuisineId = [];
+        result.rows.map((cuisine ) => {
+          _selectedCuisineId.push(cuisine[2]);
+        });
+        this.setState({ _selectedCuisineId: _selectedCuisineId });
+
       }, err => {
         console.warn(err);
       });
@@ -230,6 +237,49 @@ export default class SearchByIngredients extends React.Component {
       ];
       this.setState({ matchedCuisines: matchedCuisines });
       this.setState({displayCuisines: matchedCuisines});
+    }
+  }
+
+  getCuisineId = () => {
+    console.log('_selectedCuisines: ', this.state._selectedCuisines)
+    if (this.state.selectedIngredients != null && this.state.selectedIngredients.length) {
+      let data = { 
+        _selectedCuisines: this.state._selectedCuisines,
+      }
+      console.log('data:', data);
+      fetch("http://localhost:8081/matchedCuisines", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ data: data })
+      }).then(async res => {
+        return res.json();
+      }, err => {
+        console.warn(err);
+      }).then(async result => {
+
+        console.log('matched cuisines', result.rows);
+        let matchedCuisines = result.rows.map((cuisine, i) => {
+          return (
+            <div key={i} className="cuisine">
+              <div className="cuisineName">{cuisine[0]}</div>
+              <div className="matchingScore">{cuisine[1].toFixed(2)}%</div>
+            </div>
+          )
+        });
+        this.setState({ matchedCuisines: result.rows });
+        this.setState({displayCuisines: matchedCuisines});
+
+        let _selectedCuisines = [];
+        result.rows.map((cuisine ) => {
+          _selectedCuisines.push(cuisine[0]);
+        });
+        this.setState({ _selectedCuisines: _selectedCuisines });
+
+      }, err => {
+        console.warn(err);
+      });
     }
   }
 
@@ -257,7 +307,6 @@ export default class SearchByIngredients extends React.Component {
       () => console.log('displayCuisines:', this.state.displayCuisines)
     );
 
-
     let _selectedCuisines = [];
     slice.map((cuisine ) => {
       _selectedCuisines.push(cuisine[0]);
@@ -265,6 +314,15 @@ export default class SearchByIngredients extends React.Component {
     this.setState(
       { _selectedCuisines: _selectedCuisines },
       () => console.log('_selectedCuisines:', _selectedCuisines )
+    );    
+
+    let _selectedCuisineId = [];
+    slice.map((cuisine ) => {
+      _selectedCuisineId.push(cuisine[2]);
+    });
+    this.setState(
+      { _selectedCuisineId: _selectedCuisineId },
+      () => console.log('_selectedCuisineId:', _selectedCuisineId )
     );    
 
   };
@@ -536,11 +594,14 @@ error = () => {
               state: {// place data you want to send here!
                 selectedCities: this.state._selectedCities,
                 selectedState: this.state._selectedState,
-                selectedCuisines: this.state._selectedCuisines,
+                selectedCuisines: this.state._selectedCuisineId,
                 lat: this.state.lat,
                 lng: this.state.lng,
               }
-            }}><Button type="submit" disabled={!this.validateSearch()} > See Restaurants </Button>
+            }}>
+            <Button 
+            type="submit" disabled={!this.validateSearch()} 
+            > See Restaurants </Button>
           </Link>
 
         </div>
