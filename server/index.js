@@ -47,6 +47,12 @@ app.get('/relatedCuisines/:cuisineId', routes.getRelatedCuisines);
 /* ---- (restaurants within user-specified distance of user GPS) ---- */
 app.post('/restaurantsNearby', routes.getNearbyRestaurants);
 
+/* ---- (restaurants within user-specified conditions) ---- */
+app.post('/restaurantConditions', routes.getRestaurantsWithConditions);
+
+/* ---- (restaurants hours) ---- */
+app.post('/restaurantHours', routes.getRestaurantHours);
+
 /* ---- (cuisines strictly not using selected ingredients) ---- */
 app.post('/getCuisinesWithout', routes.getCuisinesMinusIngredients);
 
