@@ -6,6 +6,7 @@ import {
   Button,
   Modal,
 } from "react-bootstrap";
+import { TiDelete} from "react-icons/ti";
 import Select from 'react-select';
 import { API, Auth } from 'aws-amplify'
 import '../style/UserPage.css';
@@ -19,6 +20,7 @@ export default class UserPage extends React.Component {
       firstName: "",
       lastName: "",
       favoriteCuisines: [],
+      favoriteRestaurants: [],
       loading: true,
       updated: false
     }
@@ -38,8 +40,11 @@ export default class UserPage extends React.Component {
         this.setState({
           firstName: response[0].firstName,
           lastName: response[0].lastName,
-          favoriteCuisines: response[0].favoriteCuisines
+          favoriteCuisines: response[0].favoriteCuisines,
+          favoriteRestaurants: response[0].favoriteRestaurants,
         }, () => this.setState({ loading: false }));
+
+        console.log("favorite resta: ", this.state.favoriteRestaurants)
 
         await this.getCuisineTypes();
 
@@ -99,6 +104,24 @@ export default class UserPage extends React.Component {
     });
     this.setState({updated: true})
   }
+  deleteFavRestaurant = async(ID) =>{
+
+    const temp = this.state.favoriteRestaurants;
+    const filtered = temp.filter(val => val.ID != ID);
+    this.setState({favoriteRestaurants: filtered});
+
+    await API.post("cis550proj", "/users", {
+      body: {
+        id: this.state.userId,
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        favoriteCuisines: this.state.favoriteCuisines,
+        favoriteRestaurants: filtered
+      }
+    });
+
+    // alert("deleted!", ID)
+  }
 
   render() {
 
@@ -136,6 +159,17 @@ export default class UserPage extends React.Component {
                       />
                     </Form.Group>
                     {this.state.updated? <div> Updated Successfully! </div> : <div></div>}
+                    <Form.Group>
+                      <Form.Label>Favorite Restaurants</Form.Label>
+                      {this.state.favoriteRestaurants.map((val) =>{ 
+                        return (
+                        <div>
+                          {/* <div>  */}
+                            <li> {val.NAME} - {val.ADDRESS} <TiDelete onClick={ () => this.deleteFavRestaurant(val.ID)} />  </li>
+                          {/* </div> */}
+                        </div>
+                      )} )}
+                    </Form.Group>
                   </Form>
                 </Modal.Body>
                 <Modal.Footer>

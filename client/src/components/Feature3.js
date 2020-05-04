@@ -322,6 +322,7 @@ export default class Feature3 extends React.Component {
       }
     );
     const body = await response.json();
+    console.log(body.data)
     this.setState({ loading: false, restaurants: body.data });
     this.updateMap(body.data);
   }
