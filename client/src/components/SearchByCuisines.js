@@ -288,6 +288,8 @@ export default class SearchByCuisines extends React.Component {
                 selectedCities: this.state._selectedCities,
                 selectedState: this.state._selectedState,
                 selectedCuisines: this.state._selectedCuisines,
+                lat: this.state.lat,
+                lng: this.state.lng,
               }
             }}><Button type="submit" disabled={!this.validateSearch()} > Search </Button>
           </Link>
