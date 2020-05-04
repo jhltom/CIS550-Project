@@ -396,10 +396,37 @@ async function getAllCuisineTypes(req, res) {
 	}
 }
 
-/* ---- (cuisine types) ---- */
+/* ---- (cuisine types full) ---- */
 async function getAllCuisineTypesFull(req, res) {
 
 	const query = `SELECT * FROM CuisineType`;
+	let connection;
+
+	try {
+		let pool = await getPool();
+		connection = await pool.getConnection();
+		let result = await connection.execute(query);
+		result = formatResult(result);
+		res.json(result);
+	} catch (e) {
+		console.log(e);
+	} finally {
+		if (connection) {
+			try {
+				await connection.close();
+			} catch(e) {
+				console.log("Failed to close connection");
+			}
+		}
+	}
+}
+
+/* ---- (cuisine types) ---- */
+async function getSelectedCuisineInfo(req, res) {
+	const data = req.body.data;
+	const selectedIds = data.selection;
+
+	const query = `SELECT * FROM CuisineType WHERE cuisineId IN(${selectedIds.join(",")})`;
 	let connection;
 
 	try {
@@ -705,4 +732,5 @@ module.exports = {
 	getNearbyRestaurants: getNearbyRestaurants,
 	getCuisinesMinusIngredients: getCuisinesMinusIngredients,
 	getCitiesFromState : getCitiesFromState,
+	getSelectedCuisineInfo: getSelectedCuisineInfo,
 }

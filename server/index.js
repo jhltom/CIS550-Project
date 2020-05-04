@@ -29,8 +29,11 @@ app.get('/freq', routes.getFreq);
 /* ---- (cuisine types) ---- */
 app.get('/cuisineTypes', routes.getAllCuisineTypes);
 
-/* ---- (cuisine types) ---- */
+/* ---- (cuisine types full) ---- */
 app.get('/cuisineTypesFull', routes.getAllCuisineTypesFull);
+
+/* ---- (selected cuisine info) ---- */
+app.post('/cuisineInfo', routes.getSelectedCuisineInfo);
 
 /* ---- (restaurants with given cuisine) ---- */
 app.get('/cuisineRestaurants/:cuisineType/:day', routes.getRestaurantsWithCuisine);
