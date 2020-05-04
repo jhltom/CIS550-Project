@@ -1,5 +1,7 @@
 .bg {
-  background-image: url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg");
+  /* background-image: url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(19).jpg"); */
+  background-image: url("https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1862&q=80");
+  
   height: 100vh;
   background-position: center;
   background-repeat: no-repeat;
@@ -11,29 +13,29 @@
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  align-items: left;
+  align-items: right;
   padding-left: 50px;
 }
 
 .LandingPage-container .banner {
-  text-align: left;
+  text-align: right;
 }
 
 h1 {
-  color: aliceblue;
+  color: rgb(28, 34, 39);
   font-weight: 700;
   font-size: 4.5em;
 }
 
 .text{
-  color: aliceblue;
+  color: rgb(28, 34, 39);
   font-size: 1.2em;
   font-family: 'Helvetica Neue';
 }
 
 .button{
   padding-top: 20px;
-  color: aliceblue;
+  color: rgb(28, 34, 39);
   font-size: 1em;
 }
 

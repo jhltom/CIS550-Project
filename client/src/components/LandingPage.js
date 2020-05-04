@@ -2,6 +2,7 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Navbar, Button, Modal, Nav, Spinner } from 'react-bootstrap';
 import { FaHome, FaUserAlt, FaSignOutAlt } from 'react-icons/fa';
+
 import '../style/LandingPage.css';
 import {Redirect} from 'react-router-dom';
 import { Auth } from 'aws-amplify'
@@ -126,23 +127,19 @@ export default class LandingPage extends React.Component {
           </Navbar.Brand>
         </Navbar>
 
-        <div className="LandingPage-container">
+        <div className="LandingPage-container" align>
           <div className="jumbotron bg-transparent banner">
             <h1>WeEat</h1>
 
             <div className="text">
 
             
-            Getting bored with limited food choices? This is for you!
+            Getting bored with limited food choices? This is for you! A fresh take on how people search for food,
             </div>
             <div className="text">
-            A fresh take on how people search for food, especially given recent events which have forced many to shelter in place and order delivery from various restaurants.
+             especially given recent events which have forced many to shelter in place and order delivery from various restaurants.
             </div>
-            <div className="text">
 
-            As we become increasingly health-aware, we may want to search for food that contains (or omits) particular ingredients of interest.
-            
-            </div>
             <div className="text">
 
             Eat good and stay healthy!
@@ -152,12 +149,14 @@ export default class LandingPage extends React.Component {
             <div className="button"> <Button variant="primary" onClick={this.handleGetStarted}> Get Started! </Button> </div>
           </div>
         </div>
+       
 
         {/* modals */}
         {this.loginModal()}
         {this.signOutModal()}
         {this.userModal()}
       </div>
+       
     );
   }
 }
