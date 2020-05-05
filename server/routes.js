@@ -254,7 +254,7 @@ async function getMatchedCuisine(req, res) {
 			EXISTS(
 				SELECT * 
 				FROM MadeOf m2 JOIN Ingredients i ON m2.ingredientId = i.id
-				WHERE i.ingredient like '%${selectedIngredients[i]}%' AND  d.dishId = m2.dishId
+				WHERE i.ingredient = '${selectedIngredients[i]}' AND  d.dishId = m2.dishId
 			)
 		`;
 		
