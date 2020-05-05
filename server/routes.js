@@ -132,6 +132,7 @@ async function getSearchedIngredient(req, res) {
 			FROM ingredients
 			WHERE ingredient LIKE '%${search} %' OR ingredient LIKE '% ${search}%' 
 			OR ingredient LIKE '%${search}s%' OR ingredient LIKE '%${search}es%' OR ingredient = '${search}'
+			ORDER BY ingredient
 		`;
 
 	// Keep connection in wider scope
