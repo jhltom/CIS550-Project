@@ -169,6 +169,8 @@ export default class SearchByCuisines extends React.Component {
       selectedCities: 
       [
         { value: 'Los Angeles', label: 'Los Angeles' },
+        { value: 'East Los Angeles', label: 'East Los Angeles' },
+        { value: 'West Los Angeles', label: 'West Los Angeles' },
         { value: 'Anaheim', label: 'Anaheim' },
         { value: 'Garnden Grove', label: 'Garnden Grove' },
         { value: 'Glendale', label: 'Glendale' },
