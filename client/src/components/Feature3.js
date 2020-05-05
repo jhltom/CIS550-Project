@@ -351,9 +351,9 @@ export default class Feature3 extends React.Component {
           scaledSize: new window.google.maps.Size(30, 30)
         }
       });
-      // marker.addListener('click', () => {
-      //   console.log(item);
-      // });
+      marker.addListener('click', () => {
+        console.log(item);
+      });
       this.markers.push(marker);
     });
 
@@ -386,6 +386,13 @@ export default class Feature3 extends React.Component {
       let emptyField = this.state.selectedCities.length === 0;
       let filtered = this.state.unfiltered;
 
+      console.log({
+        all: all,
+        none: none,
+        emptyField: emptyField,
+        openFlag: this.state.filterOpen
+      })
+
       if (!all && !none && !emptyField) {
         let cuisineSet = new Set(this.state.selectedCuisines.map((obj) => {
           return obj.value;
@@ -406,7 +413,9 @@ export default class Feature3 extends React.Component {
             return result || item;
           }, false);
 
-          return pass && citiesSet.has(r.CITY);
+          let citiesCriteria = this.state.useLocation || citiesSet.has(r.CITY);
+
+          return pass && citiesCriteria;
         });
 
         if (this.state.filterOpen) {
