@@ -220,8 +220,20 @@ export default class SearchByCuisines extends React.Component {
     this.setState({
       selectedState: [{ value: 'CA', label: 'CA' }],
       _selectedState: 'CA',
-      selectedCities: [{ value: 'San Francisco', label: 'San Francisco' }],
-      _selectedCities: ['San Francisco'],
+      selectedCities: [
+        { value: 'San Francisco', label: 'San Francisco' },
+        { value: 'Oakland', label: 'Oakland' },
+        { value: 'East Palo Alto', label: 'East Palo Alto' },
+        { value: 'Berkeley', label: 'Berkeley' },
+        { value: 'Palo Alto', label: 'Palo Alto' },
+        { value: 'Redwood City', label: 'Redwood City' },
+        { value: 'Hayward', label: 'Hayward' },
+        { value: 'Daly City', label: 'Daly City' },
+        { value: 'Concord', label: 'Concord' },
+        { value: 'Santa Rosa', label: 'Santa Rosa' },
+      ],
+      _selectedCities: ['San Francisco', 'Oakland', 'East Palo Alto', 'Berkeley' ,'Palo Alto', 'Redwood City', 
+      'Hayward', 'Daly City' ,'Concord','Santa Rosa']
     })
   }
   handleAddFavorites = async () =>{
