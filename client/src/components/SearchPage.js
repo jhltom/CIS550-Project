@@ -84,7 +84,8 @@ export default class SearchPage extends React.Component {
 
     return (
       < div className="overall-container">
-        <div className="navBar">
+        <div id="navWrapper">
+        {/* <div className="navBar"> */}
           <Navbar bg="transparent" >
             <Navbar.Brand href="/Main" >
               <FaHome />
@@ -97,6 +98,7 @@ export default class SearchPage extends React.Component {
               <FaSignOutAlt />
             </Navbar.Brand>
           </Navbar>
+        {/* </div> */}
         </div>
 
         <div className="SearchPage-container">
