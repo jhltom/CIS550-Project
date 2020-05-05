@@ -531,7 +531,8 @@ export default class SearchByIngredients extends React.Component {
 
   handleMatchedCuisines = (matchedCuisines) => {
     this.setState({ matchedCuisines });
-    if (!matchedCuisines) {
+    console.log(matchedCuisines)
+    if (!matchedCuisines || matchedCuisines.length == 0) {
       this.setState({ hideCuisines: true });
     }
   }
