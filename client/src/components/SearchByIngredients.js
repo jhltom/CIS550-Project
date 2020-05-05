@@ -549,9 +549,10 @@ export default class SearchByIngredients extends React.Component {
         {this.state.hideCuisines ?
 
           <div className="rows">
-            <Button type="submit" onClick={this.getSearchedIngredient}>
+            <Link> <Button type="submit" onClick={this.getSearchedIngredient}>
               Search
-            </Button>
+            </Button> </Link>
+            <div > &nbsp; &nbsp;</div>
 
             <ReactSearchBox
               placeholder="Search Keyword..."
@@ -580,7 +581,7 @@ export default class SearchByIngredients extends React.Component {
               /> <label>Select All Types</label>
             </div>
             <div > &nbsp; &nbsp;</div>
-            <Button type="submit" onClick={this.getCuisines}>See Cuisines</Button>
+            <Link> <Button autosize={false} type="submit" onClick={this.getCuisines}>See Cuisines</Button></Link>
           </div>
 
           :
