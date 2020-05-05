@@ -8,6 +8,7 @@ import {Redirect} from 'react-router-dom';
 import { Button, Navbar, Nav, Modal, Spinner } from 'react-bootstrap';
 import { Auth, API } from 'aws-amplify';
 import { FaSearch, FaHome, FaUserAlt, FaSignOutAlt } from 'react-icons/fa';
+import tzOffsets from './TimezoneOffsets.js';
 
 export default class Feature3 extends React.Component {
 
@@ -422,14 +423,21 @@ export default class Feature3 extends React.Component {
 
         if (this.state.filterOpen) {
           let now = new Date();
-          let val = now.getHours() * 100 + now.getMinutes();
+          let localTime = now.getTime();
+          let localOffset = now.getTimezoneOffset() * 60000;
+          let utc = localTime + localOffset;
+
+          let destOffset = tzOffsets[this.state.selectedState];
+          let dest = utc + (destOffset * 3600000);
+          let destTime = new Date(dest);
+          let val = destTime.getHours() * 100 + destTime.getMinutes();
 
           filtered = filtered.filter((r) => {
             let hours = r.hours;
             hours = hours.filter((hour) => {
               let sameDay = hour.DAY.trim() === this.days[now.getDay()];
               let allDay = hour.ALLDAY === 1;
-              let openNow = hour.STARTHOUR <= val && val < hour.ENDHOUR
+              let openNow = hour.STARTHOUR <= val && val < hour.ENDHOUR;
 
               return sameDay && (allDay || openNow);
             });
@@ -480,14 +488,21 @@ export default class Feature3 extends React.Component {
 
         if (this.state.filterOpen) {
           let now = new Date();
-          let val = now.getHours() * 100 + now.getMinutes();
+          let localTime = now.getTime();
+          let localOffset = now.getTimezoneOffset() * 60000;
+          let utc = localTime + localOffset;
+
+          let destOffset = tzOffsets[this.state.selectedState];
+          let dest = utc + (destOffset * 3600000);
+          let destTime = new Date(dest);
+          let val = destTime.getHours() * 100 + destTime.getMinutes();
 
           filtered = filtered.filter((r) => {
             let hours = r.hours;
             hours = hours.filter((hour) => {
               let sameDay = hour.DAY.trim() === this.days[now.getDay()];
               let allDay = hour.ALLDAY === 1;
-              let openNow = hour.STARTHOUR <= val && val < hour.ENDHOUR
+              let openNow = hour.STARTHOUR <= val && val < hour.ENDHOUR;
 
               return sameDay && (allDay || openNow);
             });
@@ -581,14 +596,21 @@ export default class Feature3 extends React.Component {
 
       if (this.state.filterOpen) {
         let now = new Date();
-        let val = now.getHours() * 100 + now.getMinutes();
+        let localTime = now.getTime();
+        let localOffset = now.getTimezoneOffset() * 60000;
+        let utc = localTime + localOffset;
+
+        let destOffset = tzOffsets[this.state.selectedState];
+        let dest = utc + (destOffset * 3600000);
+        let destTime = new Date(dest);
+        let val = destTime.getHours() * 100 + destTime.getMinutes();
 
         filtered = filtered.filter((r) => {
           let hours = r.hours;
           hours = hours.filter((hour) => {
             let sameDay = hour.DAY.trim() === this.days[now.getDay()];
             let allDay = hour.ALLDAY === 1;
-            let openNow = hour.STARTHOUR <= val && val < hour.ENDHOUR
+            let openNow = hour.STARTHOUR <= val && val < hour.ENDHOUR;
 
             return sameDay && (allDay || openNow);
           });

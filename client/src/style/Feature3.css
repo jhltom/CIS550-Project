@@ -130,6 +130,11 @@ input[type="checkbox"] {
 	width: 20vw;
 }
 
+.selectItem > div > div {
+	max-height: 8em;
+	overflow-y: auto;
+}
+
 .sm-flex {
 	width: 10vw;
 }
