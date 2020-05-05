@@ -6,20 +6,20 @@ We wanted to provide a fresh take on how people search for food, especially give
 The web app will take as input ingredients that the user is interested in having. Using the list of ingredients, the web app will suggest a cuisine (or several cuisines) that are most likely to utilize those ingredients. The user will then be able to  select a cuisine from this list, after which the app will suggest restaurants nearby with that cuisine type. The goal is to provide a fresh way of choosing what food to order.
 
 ## Local set up
--Install Yarn, NodeJS, and Oracle Instant Client Package binaries. 
+1. Install Yarn, NodeJS, and Oracle Instant Client Package binaries.
+2. Run `git clone https://github.com/jhltom/CIS550-Project.git`.
+3. Go to `./client` directory: `cd client`.
+4. Install client dependencies: `yarn install`.
+5. Start client: `yarn run start`.
+6. Go to `./server` directory: `cd server`.
+7. Install server dependencies: `yarn install`.
+8. Start server: `yarn run start`.
+9. Open browser to `http://localhost:3000/`.
 
--git clone https://github.com/jhltom/CIS550-Project.git. 
 
--Go to ./client directory: cd client   
+## Pre-processing Code
+Code used for cleaning, wrangling, and ingesting were written by each member to handle the data each member was in charge of. They are located in:  
 
--Install client dependencies: yarn install. 
-
--Start client: yarn run start. 
-
--Go to ./server directory: cd server. 
-
--Install server dependencies:yarn install. 
-
--Start server: yarn run start. 
-
--Open browser to http://localhost:3000/   
+`./database/dataprocessing/*.java`  
+`./database/*.py`  
+`./utility/*`  
