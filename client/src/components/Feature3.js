@@ -14,6 +14,7 @@ export default class Feature3 extends React.Component {
     super(props);
     this.googleMap = React.createRef();
     this.markers = [];
+    this.days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     this.state = {
       map: null,
       lat: 39.9522188,
@@ -36,6 +37,7 @@ export default class Feature3 extends React.Component {
       unfiltered: [],
       restaurants: [],
       useLocation: false,
+      filterOpen: false
     }
   }
 
@@ -385,27 +387,45 @@ export default class Feature3 extends React.Component {
       let filtered = this.state.unfiltered;
 
       if (!all && !none && !emptyField) {
-        let cuisineSet = new Set(this.state.selectedCuisines.map(function(obj) {
+        let cuisineSet = new Set(this.state.selectedCuisines.map((obj) => {
           return obj.value;
         }));
 
-        let citiesSet = new Set(this.state.selectedCities.map(function(obj) {
+        let citiesSet = new Set(this.state.selectedCities.map((obj) => {
           return obj.value;
         }));
 
-        filtered = filtered.filter(function(r) {
-          let cuisineIds = r.CUISINEIDS.trim().split(",").map(function(id) {
+        filtered = filtered.filter((r) => {
+          let cuisineIds = r.CUISINEIDS.trim().split(",").map((id) => {
             return parseInt(id);
           });
 
-          let pass = cuisineIds.map(function(id) {
+          let pass = cuisineIds.map((id) => {
             return cuisineSet.has(id);
-          }).reduce(function(result, item) {
+          }).reduce((result, item) => {
             return result || item;
           }, false);
 
           return pass && citiesSet.has(r.CITY);
         });
+
+        if (this.state.filterOpen) {
+          let now = new Date();
+          let val = now.getHours() * 100 + now.getMinutes();
+
+          filtered = filtered.filter((r) => {
+            let hours = r.hours;
+            hours = hours.filter((hour) => {
+              let sameDay = hour.DAY.trim() === this.days[now.getDay()];
+              let allDay = hour.ALLDAY === 1;
+              let openNow = hour.STARTHOUR <= val && val < hour.ENDHOUR
+
+              return sameDay && (allDay || openNow);
+            });
+
+            return hours.length > 0;
+          });
+        }
       }
 
       filtered = (none || emptyField) ? [] : filtered;
@@ -425,27 +445,45 @@ export default class Feature3 extends React.Component {
       let filtered = this.state.unfiltered;
 
       if (!all && !none && !emptyField) {
-        let cuisineSet = new Set(this.state.selectedCuisines.map(function(obj) {
+        let cuisineSet = new Set(this.state.selectedCuisines.map((obj) => {
           return obj.value;
         }));
 
-        let citiesSet = new Set(this.state.selectedCities.map(function(obj) {
+        let citiesSet = new Set(this.state.selectedCities.map((obj) => {
           return obj.value;
         }));
 
-        filtered = filtered.filter(function(r) {
-          let cuisineIds = r.CUISINEIDS.trim().split(",").map(function(id) {
+        filtered = filtered.filter((r) => {
+          let cuisineIds = r.CUISINEIDS.trim().split(",").map((id) => {
             return parseInt(id);
           });
 
-          let pass = cuisineIds.map(function(id) {
+          let pass = cuisineIds.map((id) => {
             return cuisineSet.has(id);
-          }).reduce(function(result, item) {
+          }).reduce((result, item) => {
             return result || item;
           }, false);
 
           return pass && citiesSet.has(r.CITY);
         });
+
+        if (this.state.filterOpen) {
+          let now = new Date();
+          let val = now.getHours() * 100 + now.getMinutes();
+
+          filtered = filtered.filter((r) => {
+            let hours = r.hours;
+            hours = hours.filter((hour) => {
+              let sameDay = hour.DAY.trim() === this.days[now.getDay()];
+              let allDay = hour.ALLDAY === 1;
+              let openNow = hour.STARTHOUR <= val && val < hour.ENDHOUR
+
+              return sameDay && (allDay || openNow);
+            });
+
+            return hours.length > 0;
+          });
+        }
       }
 
       filtered = (none || emptyField) ? [] : filtered;
@@ -521,6 +559,66 @@ export default class Feature3 extends React.Component {
 
     this.setState({ loading: false, restaurants: preHours, unfiltered: preHours });
     this.updateMap(preHours);
+  }
+
+  toggleOpenNow = () => {
+    this.setState({ filterOpen: !this.state.filterOpen }, () => {
+      let filtered = this.state.restaurants;
+
+      if (this.state.filterOpen) {
+        let now = new Date();
+        let val = now.getHours() * 100 + now.getMinutes();
+
+        filtered = filtered.filter((r) => {
+          let hours = r.hours;
+          hours = hours.filter((hour) => {
+            let sameDay = hour.DAY.trim() === this.days[now.getDay()];
+            let allDay = hour.ALLDAY === 1;
+            let openNow = hour.STARTHOUR <= val && val < hour.ENDHOUR
+
+            return sameDay && (allDay || openNow);
+          });
+
+          return hours.length > 0;
+        });
+      } else {
+        filtered = this.state.unfiltered;
+
+        let all = (this.state.selectedCuisines.length === this.state.allCuisines.length) &&
+                  (this.state.selectedCities.length === this.state.allCities.length);
+
+        let none = (this.state.selectedCuisines.length === 0 || this.state.selectedCities.length === 0);
+        
+        if (!all && !none) {
+          let cuisineSet = new Set(this.state.selectedCuisines.map((obj) => {
+            return obj.value;
+          }));
+
+          let citiesSet = new Set(this.state.selectedCities.map((obj) => {
+            return obj.value;
+          }));
+
+          filtered = filtered.filter((r) => {
+            let cuisineIds = r.CUISINEIDS.trim().split(",").map((id) => {
+              return parseInt(id);
+            });
+
+            let pass = cuisineIds.map((id) => {
+              return cuisineSet.has(id);
+            }).reduce((result, item) => {
+              return result || item;
+            }, false);
+
+            return pass && citiesSet.has(r.CITY);
+          });
+        }
+
+        filtered = none ? [] : filtered;
+      }
+
+      this.setState({restaurants: filtered});
+      this.updateMap(filtered);
+    });
   }
 
   /**
@@ -637,6 +735,16 @@ export default class Feature3 extends React.Component {
               disabled={this.state.loading || !this.state.useLocation}
               onClick={this.handleClick}
             >Update</Button>
+          </div>
+          <div className="checkbox-container">
+            <label>
+              <input
+                type="checkbox"
+                checked={this.state.filterOpen}
+                onChange={this.toggleOpenNow}
+              />
+                Open Now
+            </label>
           </div>
         </div>
 

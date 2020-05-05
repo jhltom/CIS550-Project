@@ -12,7 +12,7 @@ html, body, #gmap {
 }
 
 .selectSection {
-	height: 20vh;
+	height: 25vh;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -26,13 +26,33 @@ html, body, #gmap {
 	align-items: center;
 }
 
+.checkbox-container {
+	width: 10vw;
+	margin-top: 20px;
+	background: #666;
+	border-radius: 5px;
+	color: white;
+	height: 2.5em;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+label {
+	margin: 0;
+}
+
+input[type="checkbox"] {
+	margin-right: 10px;
+}
+
 .displaySection {
 	display: flex;
 	box-shadow: 5px 5px 8px #888;
 }
 
 .restaurantContainer {
-	height: 80vh;
+	height: 75vh;
 	width: 40vw;
 	position: relative;
 	overflow-y: auto;
@@ -115,7 +135,7 @@ html, body, #gmap {
 }
 
 #gmap {
-	height: 80vh;
+	height: 75vh;
 	width: 60vw;
 	position: relative;
 }
