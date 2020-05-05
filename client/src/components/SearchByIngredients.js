@@ -480,7 +480,8 @@ export default class SearchByIngredients extends React.Component {
         { value: 'Concord', label: 'Concord' },
         { value: 'Santa Rosa', label: 'Santa Rosa' },
       ],
-      _selectedCities: ['San Francisco'],
+      _selectedCities: ['San Francisco', 'Oakland', 'East Palo Alto', 'Berkeley' ,'Palo Alto', 'Redwood City', 
+      'Hayward', 'Daly City' ,'Concord','Santa Rosa']
     })
   }
 
