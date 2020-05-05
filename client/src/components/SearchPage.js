@@ -15,8 +15,7 @@ export default class SearchPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      //true = search by cuisine, false = search by ingredients
-      toggleSearch: true,
+      toggleSearch: false,
       toMain: false
     }
   }
