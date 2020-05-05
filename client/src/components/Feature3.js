@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Select from 'react-select';
 import mapStyle from './MapStyle';
 import UserPage from './UserPage';
+import {Redirect} from 'react-router-dom';
 import { Button, Navbar, Nav, Modal, Spinner } from 'react-bootstrap';
 import { Auth, API } from 'aws-amplify';
 import { FaSearch, FaHome, FaUserAlt, FaSignOutAlt } from 'react-icons/fa';
@@ -16,6 +17,7 @@ export default class Feature3 extends React.Component {
     this.markers = [];
     this.days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     this.state = {
+      toMain: false,
       map: null,
       lat: 39.9522188,
       lng: -75.1954024,
@@ -659,6 +661,9 @@ export default class Feature3 extends React.Component {
       </Modal>
     )
   }
+  navigateToMain = () => {
+    this.setState({ toMain: true });
+  }
   handleShowUserModal = () =>{
     this.setState({ showUser: true });
   }
@@ -682,6 +687,10 @@ export default class Feature3 extends React.Component {
   }
 
   render() {
+    if (this.state.toMain === true) {
+      return <Redirect to='/Main' />
+    }
+
     return (
       <div className="Feature3">
         <div id="navWrapper">
