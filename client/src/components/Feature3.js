@@ -420,31 +420,38 @@ export default class Feature3 extends React.Component {
 
           return pass && citiesCriteria;
         });
+      }
 
-        if (this.state.filterOpen) {
-          let now = new Date();
+      if (this.state.filterOpen) {
+        let now = new Date();
+
+        // Fallback value
+        let destTime = now;
+
+        if (!this.state.useLocation) {
           let localTime = now.getTime();
           let localOffset = now.getTimezoneOffset() * 60000;
           let utc = localTime + localOffset;
 
           let destOffset = tzOffsets[this.state.selectedState];
           let dest = utc + (destOffset * 3600000);
-          let destTime = new Date(dest);
-          let val = destTime.getHours() * 100 + destTime.getMinutes();
-
-          filtered = filtered.filter((r) => {
-            let hours = r.hours;
-            hours = hours.filter((hour) => {
-              let sameDay = hour.DAY.trim() === this.days[now.getDay()];
-              let allDay = hour.ALLDAY === 1;
-              let openNow = hour.STARTHOUR <= val && val < hour.ENDHOUR;
-
-              return sameDay && (allDay || openNow);
-            });
-
-            return hours.length > 0;
-          });
+          destTime = new Date(dest);
         }
+
+        let val = destTime.getHours() * 100 + destTime.getMinutes();
+
+        filtered = filtered.filter((r) => {
+          let hours = r.hours;
+          hours = hours.filter((hour) => {
+            let sameDay = hour.DAY.trim() === this.days[now.getDay()];
+            let allDay = hour.ALLDAY === 1;
+            let openNow = hour.STARTHOUR <= val && val < hour.ENDHOUR;
+
+            return sameDay && (allDay || openNow);
+          });
+
+          return hours.length > 0;
+        });
       }
 
       filtered = (none || emptyField) ? [] : filtered;
@@ -485,31 +492,38 @@ export default class Feature3 extends React.Component {
 
           return pass && citiesSet.has(r.CITY);
         });
+      }
 
-        if (this.state.filterOpen) {
-          let now = new Date();
+      if (this.state.filterOpen) {
+        let now = new Date();
+
+        // Fallback value
+        let destTime = now;
+
+        if (!this.state.useLocation) {
           let localTime = now.getTime();
           let localOffset = now.getTimezoneOffset() * 60000;
           let utc = localTime + localOffset;
 
           let destOffset = tzOffsets[this.state.selectedState];
           let dest = utc + (destOffset * 3600000);
-          let destTime = new Date(dest);
-          let val = destTime.getHours() * 100 + destTime.getMinutes();
-
-          filtered = filtered.filter((r) => {
-            let hours = r.hours;
-            hours = hours.filter((hour) => {
-              let sameDay = hour.DAY.trim() === this.days[now.getDay()];
-              let allDay = hour.ALLDAY === 1;
-              let openNow = hour.STARTHOUR <= val && val < hour.ENDHOUR;
-
-              return sameDay && (allDay || openNow);
-            });
-
-            return hours.length > 0;
-          });
+          destTime = new Date(dest);
         }
+
+        let val = destTime.getHours() * 100 + destTime.getMinutes();
+
+        filtered = filtered.filter((r) => {
+          let hours = r.hours;
+          hours = hours.filter((hour) => {
+            let sameDay = hour.DAY.trim() === this.days[now.getDay()];
+            let allDay = hour.ALLDAY === 1;
+            let openNow = hour.STARTHOUR <= val && val < hour.ENDHOUR;
+
+            return sameDay && (allDay || openNow);
+          });
+
+          return hours.length > 0;
+        });
       }
 
       filtered = (none || emptyField) ? [] : filtered;
@@ -596,13 +610,20 @@ export default class Feature3 extends React.Component {
 
       if (this.state.filterOpen) {
         let now = new Date();
-        let localTime = now.getTime();
-        let localOffset = now.getTimezoneOffset() * 60000;
-        let utc = localTime + localOffset;
 
-        let destOffset = tzOffsets[this.state.selectedState];
-        let dest = utc + (destOffset * 3600000);
-        let destTime = new Date(dest);
+        // Fallback value
+        let destTime = now;
+
+        if (!this.state.useLocation) {
+          let localTime = now.getTime();
+          let localOffset = now.getTimezoneOffset() * 60000;
+          let utc = localTime + localOffset;
+
+          let destOffset = tzOffsets[this.state.selectedState];
+          let dest = utc + (destOffset * 3600000);
+          destTime = new Date(dest);
+        }
+
         let val = destTime.getHours() * 100 + destTime.getMinutes();
 
         filtered = filtered.filter((r) => {

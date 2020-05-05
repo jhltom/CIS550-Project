@@ -5,6 +5,5 @@ export default {
 	"DE": -4,
 	"CT": -4,
 	"HI": -10,
-	"PA": -4,
-	"Current Location": 0
+	"PA": -4
 }
