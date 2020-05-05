@@ -21,15 +21,7 @@ class LoginLoadingModal extends React.Component {
     this.state = {
       newUser: false,
       userId: "",
-      cuisineOptions: [
-        { value: 'American', label: 'American' },
-        { value: 'Chinese', label: 'Chinese' },
-        { value: 'French', label: 'French' },
-        { value: 'Indian', label: 'Indian' },
-        { value: 'Korean', label: 'Korean' },
-        { value: 'Mexican', label: 'Mexican' },
-        { value: 'Spanish', label: 'Spanish' },
-      ],
+      cuisineOptions: [],
       // user info
       selectedCuisines: [],
       lastName: "",
@@ -38,6 +30,7 @@ class LoginLoadingModal extends React.Component {
   }
 
   componentDidMount = async () => {
+    await this.getCuisineTypes();
     // add auth listener
     let newUser = false;
     Hub.listen('auth', (data) => {
@@ -60,6 +53,35 @@ class LoginLoadingModal extends React.Component {
         this.setState({newUser});
       }
     })
+  }
+
+  getCuisineTypes = async () => {
+    await fetch("http://localhost:8081/cuisineTypesFull/",
+      {
+        method: 'GET'
+      }).then(res => {
+        return res.json();
+      }, err => {
+        console.log(err);
+      }).then(result => {
+        console.log(result)
+        let cuisineOptions = result.data.map((row, i) => {
+          const cuisineType = row.CUISINE;
+          const cuisineId = row.CUISINEID;
+          return ({
+            value: cuisineId,
+            label: cuisineType
+          })
+        });
+        cuisineOptions.sort((x, y) => {
+          const X = x.label.toUpperCase();
+          const Y = y.label.toUpperCase();
+          return X < Y ? -1 : X > Y ? 1 : 0;
+        });
+        this.setState({ cuisineOptions });
+      }, err => {
+        console.log(err);
+      });
   }
 
   componentWillUnmount = () =>{
