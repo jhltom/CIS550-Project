@@ -159,7 +159,6 @@ export default class UserPage extends React.Component {
                         onChange={this.handleCuisinesChange}
                       />
                     </Form.Group>
-                    {this.state.updated? <div> Updated Successfully! </div> : <div></div>}
                     <Form.Group>
                       <Form.Label>Favorite Restaurants</Form.Label>
                       {this.state.favoriteRestaurants.map((val) =>{ 
@@ -174,6 +173,7 @@ export default class UserPage extends React.Component {
                   </Form>
                 </Modal.Body>
                 <Modal.Footer>
+                  {this.state.updated? <div> Updated Successfully! </div> : <div></div>}
                   <Button variant="primary" onClick={this.updateCuisines}>Update</Button>
                 </Modal.Footer>
               </div>
