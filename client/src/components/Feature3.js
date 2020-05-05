@@ -534,39 +534,42 @@ export default class Feature3 extends React.Component {
     const body_r = await response_r.json();
 
     let preHours = body_r.data;
-    let returnedIds = preHours.map(function(r) {
-      return r.ID;
-    });
 
-    let payload2 = {
-      selection: returnedIds
-    }
+    if (preHours.length) {
+      let returnedIds = preHours.map(function(r) {
+        return r.ID;
+      });
 
-    const response_h = await fetch("http://localhost:8081/restaurantHours",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({data: payload2})
+      let payload2 = {
+        selection: returnedIds
       }
-    );
-    const body_h = await response_h.json();
 
-    let hourMap = new Map();
+      const response_h = await fetch("http://localhost:8081/restaurantHours",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({data: payload2})
+        }
+      );
+      const body_h = await response_h.json();
 
-    body_h.data.forEach(function(h) {
-      let info = hourMap.get(h.BUSINESSID);
-      info = info ? info : [];
-      info.push(h);
-      hourMap.set(h.BUSINESSID, info);
-    });
+      let hourMap = new Map();
 
-    preHours.forEach(function(r) {
-      let info = hourMap.get(r.ID);
-      info = info ? info : [];
-      r.hours = info;
-    });
+      body_h.data.forEach(function(h) {
+        let info = hourMap.get(h.BUSINESSID);
+        info = info ? info : [];
+        info.push(h);
+        hourMap.set(h.BUSINESSID, info);
+      });
+
+      preHours.forEach(function(r) {
+        let info = hourMap.get(r.ID);
+        info = info ? info : [];
+        r.hours = info;
+      });
+    }
 
     this.setState({ loading: false, restaurants: preHours, unfiltered: preHours });
     this.updateMap(preHours);
