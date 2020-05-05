@@ -1,6 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Button, DropdownButton, Dropdown, Spinner, Form, Modal} from 'react-bootstrap';
+import { Button, DropdownButton, Dropdown, Spinner, Form, Modal } from 'react-bootstrap';
 import Select from 'react-select';
 import '../style/SearchPage.css';
 import ReactSearchBox from 'react-search-box'
@@ -31,6 +31,7 @@ export default class SearchByIngredients extends React.Component {
         { value: 4, label: '4' },
         { value: 5, label: '5' },
       ],
+      displayOptionSelected: "",
       selectedDisplay: 20,
       freq: [],
 
@@ -53,8 +54,13 @@ export default class SearchByIngredients extends React.Component {
       _selectedCuisineId: [],
       lat: null,
       lng: null,
-      loading: false
-      
+      loading: false,
+
+      //modal
+      showModal: false,
+      matchedCuisines: [],
+      hideCuisines: true
+
     }
   }
 
@@ -64,7 +70,7 @@ export default class SearchByIngredients extends React.Component {
       //if logged in already
       .then(async user => {
         const userId = user.username;
-        this.setState({userId})
+        this.setState({ userId })
       })
       //if not logged in
       .catch(err => {
@@ -74,7 +80,7 @@ export default class SearchByIngredients extends React.Component {
   }
 
   getFreq = () => {
-    fetch("http://localhost:8081/freq",{
+    fetch("http://localhost:8081/freq", {
       method: 'GET'
     }).then(res => {
       return res.json();
@@ -89,7 +95,7 @@ export default class SearchByIngredients extends React.Component {
           freq: freq
         })
       });
-      this.setState({freq});
+      this.setState({ freq });
       console.log(freq);
     }, err => {
       console.log(err);
@@ -97,7 +103,7 @@ export default class SearchByIngredients extends React.Component {
   }
 
   getAllIngredients = () => {
-    fetch("http://localhost:8081/ingredients/",{
+    fetch("http://localhost:8081/ingredients/", {
       method: 'GET'
     }).then(res => {
       return res.json();
@@ -111,7 +117,7 @@ export default class SearchByIngredients extends React.Component {
           label: ingredient
         })
       });
-      this.setState({ingredientsOptions});
+      this.setState({ ingredientsOptions });
       console.log(ingredientsOptions);
     }, err => {
       console.log(err);
@@ -149,7 +155,7 @@ export default class SearchByIngredients extends React.Component {
         { ingredientsOptions: options },
       );
       let checked = false;
-      this.setState({checked});
+      this.setState({ checked });
       console.log(options);
       console.log('test uncheck', this.state.checked);
     }, err => {
@@ -165,8 +171,8 @@ export default class SearchByIngredients extends React.Component {
 
   handleCheck = (event) => {
     let checked = event.target.checked;
-    this.setState({checked});
-    if(checked){
+    this.setState({ checked });
+    if (checked) {
       let update = this.state.selectedIngredients.concat(this.state.ingredientsOptions);
       this.setState(
         { selectedIngredients: update },
@@ -177,13 +183,17 @@ export default class SearchByIngredients extends React.Component {
   };
 
   getCuisines = () => {
+
+    // open moda;
+    this.setState({ showModal: true })
+
     console.log('selected: ', this.state.selectedIngredients)
     if (this.state.selectedIngredients != null && this.state.selectedIngredients.length) {
       let selection = this.state.selectedIngredients.map(ingredient => {
         return ingredient.value;
       });
       console.log('let lelection:', selection);
-      let data = { 
+      let data = {
         selection: selection,
         display: this.state.selectedDisplay.value
       }
@@ -210,16 +220,16 @@ export default class SearchByIngredients extends React.Component {
           )
         });
         this.setState({ matchedCuisines: result.rows });
-        this.setState({displayCuisines: matchedCuisines});
+        this.setState({ displayCuisines: matchedCuisines });
 
         let _selectedCuisines = [];
-        result.rows.map((cuisine ) => {
+        result.rows.map((cuisine) => {
           _selectedCuisines.push(cuisine[0]);
         });
         this.setState({ _selectedCuisines: _selectedCuisines });
 
         let _selectedCuisineId = [];
-        result.rows.map((cuisine ) => {
+        result.rows.map((cuisine) => {
           _selectedCuisineId.push(cuisine[2]);
         });
         this.setState({ _selectedCuisineId: _selectedCuisineId });
@@ -236,14 +246,14 @@ export default class SearchByIngredients extends React.Component {
         </div>
       ];
       this.setState({ matchedCuisines: matchedCuisines });
-      this.setState({displayCuisines: matchedCuisines});
+      this.setState({ displayCuisines: matchedCuisines });
     }
   }
 
   getCuisineId = () => {
     console.log('_selectedCuisines: ', this.state._selectedCuisines)
     if (this.state.selectedIngredients != null && this.state.selectedIngredients.length) {
-      let data = { 
+      let data = {
         _selectedCuisines: this.state._selectedCuisines,
       }
       console.log('data:', data);
@@ -269,10 +279,10 @@ export default class SearchByIngredients extends React.Component {
           )
         });
         this.setState({ matchedCuisines: result.rows });
-        this.setState({displayCuisines: matchedCuisines});
+        this.setState({ displayCuisines: matchedCuisines });
 
         let _selectedCuisines = [];
-        result.rows.map((cuisine ) => {
+        result.rows.map((cuisine) => {
           _selectedCuisines.push(cuisine[0]);
         });
         this.setState({ _selectedCuisines: _selectedCuisines });
@@ -286,10 +296,10 @@ export default class SearchByIngredients extends React.Component {
   handleDisplayChange = selectedDisplay => {
     let display = selectedDisplay.value;
     this.setState(
-      {selectedDisplay: display},
+      { selectedDisplay: selectedDisplay },
       () => console.log(`Display selected:`, this.state.selectedDisplay)
     );
-      
+
     let slice = this.state.matchedCuisines.slice(0, display);
     console.log('slice:', slice);
 
@@ -303,309 +313,345 @@ export default class SearchByIngredients extends React.Component {
     });
 
     this.setState(
-      {displayCuisines: displayCuisines},
+      { displayCuisines: displayCuisines },
       () => console.log('displayCuisines:', this.state.displayCuisines)
     );
 
     let _selectedCuisines = [];
-    slice.map((cuisine ) => {
+    slice.map((cuisine) => {
       _selectedCuisines.push(cuisine[0]);
     });
     this.setState(
       { _selectedCuisines: _selectedCuisines },
-      () => console.log('_selectedCuisines:', _selectedCuisines )
-    );    
+      () => console.log('_selectedCuisines:', _selectedCuisines)
+    );
 
     let _selectedCuisineId = [];
-    slice.map((cuisine ) => {
+    slice.map((cuisine) => {
       _selectedCuisineId.push(cuisine[2]);
     });
     this.setState(
       { _selectedCuisineId: _selectedCuisineId },
-      () => console.log('_selectedCuisineId:', _selectedCuisineId )
-    );    
+      () => console.log('_selectedCuisineId:', _selectedCuisineId)
+    );
 
   };
 
-//   onChange(e, i){
-//     let value = this.state.value.slice();
-//     value[i] = e.target.checked;
-//     this.setState({value})
-//  }
-     
-//  unCheck(i){
-//     let value = this.state.value.slice();
-//     value[i] = !value[i];
-//     this.setState({value})
-//  }
+  //   onChange(e, i){
+  //     let value = this.state.value.slice();
+  //     value[i] = e.target.checked;
+  //     this.setState({value})
+  //  }
 
-fetchCities = async (state) => {
-  console.log(state)
-  await fetch("http://localhost:8081/cities/" + state,
-    {
-      method: 'GET'
-    }).then(res => {
-      return res.json();
-    }, err => {
-      console.log(err);
-    }).then(result => {
-      console.log("result: ", result)
-      let citiesOptions = result.rows.map((row, i) => {
-        const citiesOption = row[0].trim();
-        return ({
-          value: citiesOption,
-          label: citiesOption
-        })
+  //  unCheck(i){
+  //     let value = this.state.value.slice();
+  //     value[i] = !value[i];
+  //     this.setState({value})
+  //  }
+
+  fetchCities = async (state) => {
+    console.log(state)
+    await fetch("http://localhost:8081/cities/" + state,
+      {
+        method: 'GET'
+      }).then(res => {
+        return res.json();
+      }, err => {
+        console.log(err);
+      }).then(result => {
+        console.log("result: ", result)
+        let citiesOptions = result.rows.map((row, i) => {
+          const citiesOption = row[0].trim();
+          return ({
+            value: citiesOption,
+            label: citiesOption
+          })
+        });
+        citiesOptions.sort((x, y) => {
+          const X = x.value.toUpperCase();
+          const Y = y.value.toUpperCase();
+          return X < Y ? -1 : X > Y ? 1 : 0;
+        });
+        this.setState({ citiesOptions });
+      }, err => {
+        console.log(err);
       });
-      citiesOptions.sort((x, y) => {
-        const X = x.value.toUpperCase();
-        const Y = y.value.toUpperCase();
-        return X < Y ? -1 : X > Y ? 1 : 0;
-      });
-      this.setState({ citiesOptions });
-    }, err => {
-      console.log(err);
-    });
-}
-handleCitiesChange = (selectedCities) => {
-  let _selectedCities = [];
-  if (selectedCities) {
-    selectedCities.map((element) => {
-      _selectedCities.push(element.value);
+  }
+  handleCitiesChange = (selectedCities) => {
+    let _selectedCities = [];
+    if (selectedCities) {
+      selectedCities.map((element) => {
+        _selectedCities.push(element.value);
+      })
+    }
+    this.setState({ selectedCities, _selectedCities });
+  }
+  handleStateChange = (selectedState) => {
+    this.setState({ selectedState, _selectedState: selectedState.value, selectedCities: [], _selectedCities: [] });
+    this.fetchCities(selectedState.value);
+  }
+  validateSearch = () => {
+    return (
+      this.state._selectedCities.length > 0 &&
+      this.state._selectedState.length > 0 &&
+      this.state.displayCuisines.length > 0
+    )
+  }
+  handleCurrentLocation = () => {
+    this.setState({
+      selectedState: [{ value: 'Current Location', label: 'Current Location' }],
+      _selectedState: 'Current Location',
+      selectedCities: [{ value: 'Current Location', label: 'Current Location' }],
+      _selectedCities: ['Current Location'],
+    })
+    if (!navigator.geolocation) {
+      console.log("Geolocation isn't supported on your browser.");
+    } else {
+      navigator.geolocation.getCurrentPosition(this.success, this.error);
+    }
+  }
+  handleLosAngeles = () => {
+    this.setState({
+      selectedState: [{ value: 'CA', label: 'CA' }],
+      _selectedState: 'CA',
+      selectedCities:
+        [
+          { value: 'Los Angeles', label: 'Los Angeles' },
+          { value: 'Anaheim', label: 'Anaheim' },
+          { value: 'Garnden Grove', label: 'Garnden Grove' },
+          { value: 'Glendale', label: 'Glendale' },
+          { value: 'Huntington Beach', label: 'Huntington Beach' },
+          { value: 'Irvine', label: 'Irvine' },
+          { value: 'Long Beach', label: 'Long Beach' },
+          { value: 'Moreno Valley', label: 'Moreno Valley' },
+          { value: 'Ontario', label: 'Ontario' },
+          { value: 'Oxnard', label: 'Oxnard' },
+          { value: 'Pasadena', label: 'Pasadena' },
+          { value: 'Rancho Cucamonga', label: 'Rancho Cucamonga' },
+          { value: 'Riverside', label: 'Riverside' },
+          { value: 'San Bernardino', label: 'San Bernardino' },
+          { value: 'Santa Ana', label: 'Santa Ana' },
+          { value: 'Santa Clarita', label: 'Santa Clarita' },
+          { value: 'Torrance', label: 'Torrance' },
+        ],
+      _selectedCities: ['Los Angeles', "Anaheim", "Garnden Grove", "Glendale",
+        "Huntington Beach", "Irvine", 'Long Beach', 'Moreno Valley', 'Ontario', 'Oxnard', 'Pasadena', 'Rancho Cucamonga', 'Riverside',
+        'San Bernardino', 'Santa Ana', 'Santa Clarita', 'Torrance'],
     })
   }
-  this.setState({ selectedCities, _selectedCities });
-}
-handleStateChange = (selectedState) => {
-  this.setState({ selectedState, _selectedState: selectedState.value, selectedCities: [], _selectedCities: [] });
-  this.fetchCities(selectedState.value);
-}
-validateSearch = () => {
-  return (
-    this.state._selectedCities.length > 0 &&
-    this.state._selectedState.length > 0 &&
-    this.state.displayCuisines.length > 0
-  )
-}
-handleCurrentLocation = () => {
-  this.setState({
-    selectedState: [{ value: 'Current Location', label: 'Current Location' }],
-    _selectedState: 'Current Location',
-    selectedCities: [{ value: 'Current Location', label: 'Current Location' }],
-    _selectedCities: ['Current Location'],
-  })
-  if (!navigator.geolocation) {
-    console.log("Geolocation isn't supported on your browser.");
-  } else {
-    navigator.geolocation.getCurrentPosition(this.success, this.error);
+  handleNewYorkCity = () => {
+    this.setState({
+      selectedState: [{ value: 'NY', label: 'NY' }],
+      _selectedState: 'NY',
+      selectedCities: [{ value: 'New York', label: 'New York' }, { value: 'New York City', label: 'New York City' }],
+      _selectedCities: ['New York', 'New York City'],
+    })
   }
-}
-handleLosAngeles = () => {
-  this.setState({
-    selectedState: [{ value: 'CA', label: 'CA' }],
-    _selectedState: 'CA',
-    selectedCities: 
-    [
-      { value: 'Los Angeles', label: 'Los Angeles' },
-      { value: 'Anaheim', label: 'Anaheim' },
-      { value: 'Garnden Grove', label: 'Garnden Grove' },
-      { value: 'Glendale', label: 'Glendale' },
-      { value: 'Huntington Beach', label: 'Huntington Beach' },
-      { value: 'Irvine', label: 'Irvine' },
-      { value: 'Long Beach', label: 'Long Beach' },
-      { value: 'Moreno Valley', label: 'Moreno Valley' },
-      { value: 'Ontario', label: 'Ontario' },
-      { value: 'Oxnard', label: 'Oxnard' },
-      { value: 'Pasadena', label: 'Pasadena' },
-      { value: 'Rancho Cucamonga', label: 'Rancho Cucamonga' },
-      { value: 'Riverside', label: 'Riverside' },
-      { value: 'San Bernardino', label: 'San Bernardino' },
-      { value: 'Santa Ana', label: 'Santa Ana' },
-      { value: 'Santa Clarita', label: 'Santa Clarita' },
-      { value: 'Torrance', label: 'Torrance' },
-    ],
-    _selectedCities: ['Los Angeles', "Anaheim","Garnden Grove","Glendale",
-    "Huntington Beach","Irvine", 'Long Beach' ,'Moreno Valley','Ontario','Oxnard', 'Pasadena', 'Rancho Cucamonga','Riverside',
-  'San Bernardino', 'Santa Ana', 'Santa Clarita', 'Torrance'  ],
-  })
-}
-handleNewYorkCity = () => {
-  this.setState({
-    selectedState: [{ value: 'NY', label: 'NY' }],
-    _selectedState: 'NY',
-    selectedCities: [{ value: 'New York', label: 'New York' }, { value: 'New York City', label: 'New York City' }],
-    _selectedCities: ['New York','New York City'],
-  })
-}
-handlePhiladelphia = () => {
-  this.setState({
-    selectedState: [{ value: 'PA', label: 'PA' }],
-    _selectedState: 'PA',
-    selectedCities: 
-    [
-      { value: 'Philadelphia', label: 'Philadelphia' },
-      { value: 'Bucks', label: 'Bucks' },
-      { value: 'Chester', label: 'Chester' },
-      { value: 'Delaware', label: 'Delaware' },
-      { value: 'Montgomery', label: 'Montgomery' },
-    ],
-    _selectedCities: ['Philadelphia','Bucks','Chester','Delaware','Montgomery'],
-  })
-}
-handleSanFrancisco = () => {
-  this.setState({
-    selectedState: [{ value: 'CA', label: 'CA' }],
-    _selectedState: 'CA',
-    selectedCities: [{ value: 'San Francisco', label: 'San Francisco' }],
-    _selectedCities: ['San Francisco'],
-  })
-}
+  handlePhiladelphia = () => {
+    this.setState({
+      selectedState: [{ value: 'PA', label: 'PA' }],
+      _selectedState: 'PA',
+      selectedCities:
+        [
+          { value: 'Philadelphia', label: 'Philadelphia' },
+          { value: 'Bucks', label: 'Bucks' },
+          { value: 'Chester', label: 'Chester' },
+          { value: 'Delaware', label: 'Delaware' },
+          { value: 'Montgomery', label: 'Montgomery' },
+        ],
+      _selectedCities: ['Philadelphia', 'Bucks', 'Chester', 'Delaware', 'Montgomery'],
+    })
+  }
+  handleSanFrancisco = () => {
+    this.setState({
+      selectedState: [{ value: 'CA', label: 'CA' }],
+      _selectedState: 'CA',
+      selectedCities: [{ value: 'San Francisco', label: 'San Francisco' }],
+      _selectedCities: ['San Francisco'],
+    })
+  }
 
-success = position => {
-  const latitude = position.coords.latitude;
-  const longitude = position.coords.longitude;
+  success = position => {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
 
-  this.setState({ lat: latitude, lng: longitude, loading: false });
-  console.log("latitude: ", latitude);
-  console.log("latitude: ", longitude);
-}
+    this.setState({ lat: latitude, lng: longitude, loading: false });
+    console.log("latitude: ", latitude);
+    console.log("latitude: ", longitude);
+  }
 
-error = () => {
-  console.log("Could not geolocate this browser.");
-}
+  error = () => {
+    console.log("Could not geolocate this browser.");
+  }
+  handleCloseModal = () => {
+    this.setState({ showModal: false })
+  }
+  cuinesSelected = () => {
+    console.log(this.state._selectedCuisines);
+    console.log(this.state._selectedCuisineId);
+
+    let matchedCuisines = []
+    this.state._selectedCuisines.map((val) => {
+      matchedCuisines.push({ value: val, label: val })
+    })
+
+    this.setState({ matchedCuisines, hideCuisines: false });
+    this.handleCloseModal();
+  }
+
+  cuisineMatchingModal = () => {
+    return (
+      <Modal show={this.state.showModal} onHide={this.handleCloseModal}>
+        <Modal.Body>
+          <div className="header-container">
+            <div className="headers">
+              <div className="header"><strong>Cuisine Type</strong></div>
+              <div className="header"><strong>Matching Scores</strong></div>
+            </div>
+          </div>
+          <div className="results-container" id="results">
+            {this.state.displayCuisines}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <div>Filter Top Cuisine(s)</div>
+          <Select
+            styles={selectStyles}
+            placeholder={''}
+            value={this.state.selectedDisplay}
+            size={50}
+            options={this.state.displayOptions}
+            onChange={this.handleDisplayChange}
+          />
+          <Button variant="secondary" onClick={this.cuinesSelected}>Done</Button>
+        </Modal.Footer>
+      </Modal>
+    )
+  }
+
+  handleMatchedCuisines = (matchedCuisines) => {
+    this.setState({ matchedCuisines });
+    if (!matchedCuisines) {
+      this.setState({ hideCuisines: true });
+    }
+  }
+  showCuisineSearch = () =>{
+   this.setState({hideCuisines: true});
+  }
 
   render() {
 
     return (
       <div>
-        <div className="rows">
-          <Button type="submit" onClick={this.getSearchedIngredient}>
-            Search
-              </Button>
+        {this.cuisineMatchingModal()}
 
-          <ReactSearchBox
-            placeholder="Search Keyword..."
-            onChange={this.handleSearchChange}
-            value={this.state.search}
-          />
+        {this.state.hideCuisines ?
 
-          <div > &nbsp; &nbsp;</div>
-          <Select
-            isMulti
-            styles={selectStyles}
-            value={this.state.selectedIngredients}
-            isSearchable
-            placeholder="Select ingredient(s) ... "
-            size={50}
-            options={this.state.ingredientsOptions}
-            onChange={this.handleSelectedChange}
-          />
-          <div > &nbsp; &nbsp;</div>
-          <div class="Checkbox">
-            <Checkbox
-              type="checkbox"
-              style={{display: 'inline-flex', flexDirection: 'row'}}
-              checked={this.state.checked}
-              onClick={this.handleCheck}
-            /> <label>Select All Types</label>      
+          <div className="rows">
+            <Button type="submit" onClick={this.getSearchedIngredient}>
+              Search
+            </Button>
+
+            <ReactSearchBox
+              placeholder="Search Keyword..."
+              onChange={this.handleSearchChange}
+              value={this.state.search}
+            />
+            <div > &nbsp; &nbsp;</div>
+
+            <Select
+              isMulti
+              styles={selectStyles}
+              value={this.state.selectedIngredients}
+              isSearchable
+              placeholder="Select ingredient(s) ... "
+              size={50}
+              options={this.state.ingredientsOptions}
+              onChange={this.handleSelectedChange}
+            />
+            <div > &nbsp; &nbsp;</div>
+            <div class="Checkbox">
+              <Checkbox
+                type="checkbox"
+                style={{ display: 'inline-flex', flexDirection: 'row' }}
+                checked={this.state.checked}
+                onClick={this.handleCheck}
+              /> <label>Select All Types</label>
+            </div>
+            <div > &nbsp; &nbsp;</div>
+            <Button type="submit" onClick={this.getCuisines}>See Cuisines</Button>
           </div>
-          <div > &nbsp; &nbsp;</div>
-          <Button type="submit" onClick={this.getCuisines}>See Cuisines</Button>
 
-        </div>
+          :
+          <div>
+            <div className="rows">
+              <IconContext.Provider value={{ style: { color: 'white', marginRight: '5' } }}>
+                <TiHeartFullOutline size={35} />
+              </IconContext.Provider>
+              <Select
+                isMulti
+                styles={selectStyles}
+                value={this.state.matchedCuisines}
+                // isSearchable
+                placeholder=""
+                // options={this.state.cuisineOptions}
+                onChange={this.handleMatchedCuisines}
+              />
+              <div > &nbsp; &nbsp;</div>
+              <Button type="submit" onClick={this.showCuisineSearch}> ⏎ Return to Ingredients</Button>
+            </div>
 
-        <br></br>
-        <br></br>
-        <br></br>
-
-
-        <div className="header-container">
-            <div className="headers">
-              <div className="header"><strong>Cuisine Type</strong></div>
-              <div className="header"><strong>Matching Scores</strong></div>
+            <div className="rows3">
+              <IconContext.Provider value={{ style: { color: 'white', marginRight: '5' } }}>
+                <TiLocation size={35} />
+              </IconContext.Provider>
+              <DropdownButton id="dropdown-item-button" title="☆">
+                <Dropdown.Item as="button" onClick={this.handleCurrentLocation}>Current Location</Dropdown.Item>
+                <Dropdown.Item as="button" onClick={this.handleLosAngeles}>Greater Los Angeles Area</Dropdown.Item>
+                <Dropdown.Item as="button" onClick={this.handleNewYorkCity}>Greater New York Area</Dropdown.Item>
+                <Dropdown.Item as="button" onClick={this.handlePhiladelphia}>Greater Philadelphia Area</Dropdown.Item>
+                <Dropdown.Item as="button" onClick={this.handleSanFrancisco}>Greater San Francisco Bay Area</Dropdown.Item>
+              </DropdownButton>
+              <div > &nbsp; &nbsp;</div>
               <Select
                 styles={selectStyles}
-                placeholder = {''}
-                value={this.state.selectedDisplay}
-                size={50}
-                options={this.state.displayOptions}
-                onChange={this.handleDisplayChange}
+                value={this.state.selectedState}
+                placeholder="Select State"
+                options={this.state.stateOptions}
+                onChange={this.handleStateChange}
               />
-              <div>Filter Top Cuisine(s)</div>
+              <div > &nbsp; &nbsp;</div>
+              <Select
+                styles={selectStyles}
+                value={this.state.selectedCities}
+                isMulti
+                placeholder="Select Cities"
+                options={this.state.citiesOptions}
+                onChange={this.handleCitiesChange}
+              />
+
+              <div > &nbsp; &nbsp;</div>
+
+              <Link
+                to={{
+                  pathname: `/Feature3`,
+                  state: {// place data you want to send here!
+                    selectedCities: this.state._selectedCities,
+                    selectedState: this.state._selectedState,
+                    selectedCuisines: this.state._selectedCuisineId,
+                    lat: this.state.lat,
+                    lng: this.state.lng,
+                  }
+                }}>
+                <Button
+                  type="submit" disabled={!this.validateSearch()}
+                > See Restaurants </Button>
+              </Link>
+
             </div>
           </div>
 
-          <div className="results-container" id="results">
-            {this.state.displayCuisines}
-          </div>
-
-
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-          <br></br>
-
-
-
-
-
-
-          <div className="rows3">
-          <IconContext.Provider value={{ style: { color: 'white', marginRight: '5' } }}>
-            <TiLocation size={35} />
-          </IconContext.Provider>
-          <DropdownButton id="dropdown-item-button" title="☆">
-            <Dropdown.Item as="button" onClick={this.handleCurrentLocation}>Current Location</Dropdown.Item>
-            <Dropdown.Item as="button" onClick={this.handleLosAngeles}>Greater Los Angeles Area</Dropdown.Item>
-            <Dropdown.Item as="button" onClick={this.handleNewYorkCity}>Greater New York Area</Dropdown.Item>
-            <Dropdown.Item as="button" onClick={this.handlePhiladelphia}>Greater Philadelphia Area</Dropdown.Item>
-            <Dropdown.Item as="button" onClick={this.handleSanFrancisco}>Greater San Francisco Bay Area</Dropdown.Item>
-          </DropdownButton>
-          <div > &nbsp; &nbsp;</div>
-          <Select
-            styles={selectStyles}
-            value={this.state.selectedState}
-            placeholder="Select State"
-            options={this.state.stateOptions}
-            onChange={this.handleStateChange}
-          />
-          <div > &nbsp; &nbsp;</div>
-          <Select
-            styles={selectStyles}
-            value={this.state.selectedCities}
-            isMulti
-            placeholder="Select Cities"
-            options={this.state.citiesOptions}
-            onChange={this.handleCitiesChange}
-          />
-
-          <div > &nbsp; &nbsp;</div>
-
-          <Link
-            to={{
-              pathname: `/Feature3`,
-              state: {// place data you want to send here!
-                selectedCities: this.state._selectedCities,
-                selectedState: this.state._selectedState,
-                selectedCuisines: this.state._selectedCuisineId,
-                lat: this.state.lat,
-                lng: this.state.lng,
-              }
-            }}>
-            <Button 
-            type="submit" disabled={!this.validateSearch()} 
-            > See Restaurants </Button>
-          </Link>
-
-        </div>
-
+        }
 
         {/* <div>
            {[1,2,3,4,5].map((item,i) => {
@@ -618,14 +664,8 @@ error = () => {
            })}      
       </div> */}
 
-
-
       </div>
 
-
-
-
-      
     )
   }
 }
