@@ -357,11 +357,12 @@ export default class Feature3 extends React.Component {
         icon: {
           url: "/marker.png",
           scaledSize: new window.google.maps.Size(30, 30)
-        }
+        },
+        map: map
       });
-      marker.addListener('click', () => {
-        console.log(item);
-      });
+      // marker.addListener('click', () => {
+      //   console.log(item);
+      // });
       this.markers.push(marker);
     });
 
@@ -370,11 +371,11 @@ export default class Feature3 extends React.Component {
     map.panToBounds(bounds);
 
     // Place markers
-    this.markers.forEach((marker, idx) => {
-      window.setTimeout(() => {
-        marker.setMap(map);
-      }, idx * 100);
-    });
+    // this.markers.forEach((marker, idx) => {
+    //   window.setTimeout(() => {
+    //     marker.setMap(map);
+    //   }, idx * 100);
+    // });
   }
 
   markerBounce = idx => {
@@ -393,13 +394,6 @@ export default class Feature3 extends React.Component {
       let none = this.state.selectedCuisines.length === 0;
       let emptyField = this.state.selectedCities.length === 0;
       let filtered = this.state.unfiltered;
-
-      console.log({
-        all: all,
-        none: none,
-        emptyField: emptyField,
-        openFlag: this.state.filterOpen
-      })
 
       if (!all && !none && !emptyField) {
         let cuisineSet = new Set(this.state.selectedCuisines.map((obj) => {
