@@ -101,7 +101,7 @@ export default class SearchPage extends React.Component {
 
         <div className="SearchPage-container">
           <div className="header">
-            <img src={logo} className="SearchPage-logo" alt="logo" />
+            <img src="/undraw.svg" className="search-logo" alt="logo" />
           </div>
           <div className="searchBar-container">
             {this.state.toggleSearch ?
