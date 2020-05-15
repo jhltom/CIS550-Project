@@ -1,5 +1,8 @@
 # WeEat
 
+## Demo
+https://tinyurl.com/we-eat-demo
+
 ## Description
 We wanted to provide a fresh take on how people search for food, especially given recent events which have forced many to shelter in place and order delivery from various restaurants. As we become increasingly health-aware, we may want to search for food that contains (or omits) particular ingredients of interest. More broadly, perhaps we don’t have a good idea of what we’d like to eat on a particular day, and would like to see what kinds of cuisines are most likely to contain my food items of interest. This is what our app would like to address.
 
